@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NARU — The Chef Marketplace</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --parchment: #F7F2EA;
+    --warm-white: #FDFAF5;
+    --terracotta: #C1603A;
+    --terracotta-light: #E8856A;
+    --forest: #3B5E45;
+    --forest-light: #E8EFE9;
+    --ink: #1A1610;
+    --ink-soft: #3D352A;
+    --stone: #7A6E62;
+    --stone-light: #C4BCB2;
+    --blush: #F2E4D8;
+    --gold: #B8975A;
+    --gold-pale: #F5EDD9;
+    --border: rgba(26,22,16,0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--warm-white);
+    color: var(--ink);
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1.4rem 4rem;
+    background: rgba(253,250,245,0.94);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo-wrap { display: flex; flex-direction: column; }
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem; font-weight: 700;
+    color: var(--ink); letter-spacing: 0.12em; line-height: 1;
+  }
+  .logo-tagline {
+    font-size: 0.58rem; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--stone); margin-top: 3px;
+  }
+
+  nav ul { list-style: none; display: flex; gap: 2.5rem; align-items: center; }
+  nav a {
+    color: var(--stone); text-decoration: none;
+    font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase;
+    font-weight: 500; transition: color 0.3s;
+  }
+  nav a:hover { color: var(--ink); }
+
+  .nav-btn {
+    background: var(--terracotta); color: white;
+    padding: 0.65rem 1.5rem; border: none; cursor: pointer;
+    font-family: 'Jost', sans-serif; font-size: 0.75rem;
+    font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase;
+    transition: background 0.25s; border-radius: 2px;
+  }
+  .nav-btn:hover { background: var(--ink); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh; display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding-top: 80px; overflow: hidden;
+  }
+
+  .hero-left {
+    background: var(--parchment);
+    padding: 7rem 4rem 5rem;
+    display: flex; flex-direction: column; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .hero-left::before {
+    content: '';
+    position: absolute; top: -120px; left: -120px;
+    width: 380px; height: 380px; border-radius: 50%;
+    border: 60px solid rgba(184,151,90,0.07);
+    pointer-events: none;
+  }
+  .hero-left::after {
+    content: '';
+    position: absolute; bottom: -80px; right: -80px;
+    width: 240px; height: 240px; border-radius: 50%;
+    border: 40px solid rgba(193,96,58,0.07);
+    pointer-events: none;
+  }
+
+  .hero-kicker {
+    display: flex; align-items: center; gap: 0.8rem;
+    font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--terracotta); margin-bottom: 2rem;
+    animation: fadeUp 0.8s ease both;
+  }
+  .kicker-line { width: 32px; height: 1px; background: var(--terracotta); }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.8rem, 4.5vw, 4.4rem);
+    font-weight: 400; line-height: 1.12; letter-spacing: -0.01em;
+    margin-bottom: 1.8rem;
+    animation: fadeUp 0.8s ease 0.1s both;
+  }
+  h1 em { font-style: italic; color: var(--terracotta); }
+
+  .hero-body {
+    font-size: 1rem; line-height: 1.85; color: var(--stone);
+    max-width: 400px; margin-bottom: 2.8rem; font-weight: 300;
+    animation: fadeUp 0.8s ease 0.2s both;
+  }
+
+  .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; animation: fadeUp 0.8s ease 0.3s both; }
+
+  .btn-fill {
+    background: var(--terracotta); color: white;
+    padding: 0.9rem 2rem; border: 1px solid var(--terracotta);
+    font-family: 'Jost', sans-serif; font-size: 0.78rem;
+    font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase;
+    cursor: pointer; transition: all 0.25s; text-decoration: none;
+    display: inline-block; border-radius: 2px;
+  }
+  .btn-fill:hover { background: var(--ink); border-color: var(--ink); }
+
+  .btn-ghost {
+    background: transparent; color: var(--ink);
+    padding: 0.9rem 2rem; border: 1px solid rgba(26,22,16,0.25);
+    font-family: 'Jost', sans-serif; font-size: 0.78rem;
+    font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase;
+    cursor: pointer; transition: all 0.25s; text-decoration: none;
+    display: inline-block; border-radius: 2px;
+  }
+  .btn-ghost:hover { border-color: var(--terracotta); color: var(--terracotta); }
+
+  .hero-stats {
+    display: flex; gap: 2.5rem; margin-top: 3.5rem; padding-top: 2.5rem;
+    border-top: 1px solid var(--border);
+    animation: fadeUp 0.8s ease 0.4s both;
+  }
+  .stat-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem; font-weight: 400; color: var(--ink); line-height: 1;
+  }
+  .stat-label { font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--stone); margin-top: 0.3rem; }
+
+  /* Hero right */
+  .hero-right {
+    background: var(--forest); position: relative;
+    overflow: hidden; display: flex; align-items: flex-end;
+    justify-content: center; padding-bottom: 3rem;
+  }
+
+  .arch-wrap {
+    position: absolute; bottom: -20px; left: 50%;
+    transform: translateX(-50%);
+    width: 340px; height: 170px; overflow: hidden;
+  }
+  .arch {
+    position: absolute; bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+    border: 1.5px solid rgba(255,255,255,0.1);
+  }
+  .arch-1 { width: 340px; height: 170px; }
+  .arch-2 { width: 275px; height: 138px; }
+  .arch-3 { width: 210px; height: 105px; }
+  .arch-4 { width: 145px; height: 73px; }
+
+  .dot-deco {
+    position: absolute; border-radius: 50%;
+    background: rgba(184,151,90,0.2);
+    animation: floatDot 7s ease-in-out infinite;
+  }
+  .dot-1 { width: 80px; height: 80px; top: 14%; left: 9%; }
+  .dot-2 { width: 40px; height: 40px; top: 42%; right: 11%; animation-delay: 2s; }
+  .dot-3 { width: 130px; height: 130px; top: 7%; right: 4%; opacity: 0.35; animation-delay: 1s; }
+
+  @keyframes floatDot { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-16px)} }
+
+  .hero-float-card {
+    position: relative; z-index: 2;
+    background: rgba(253,250,245,0.1);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 8px; padding: 1.8rem 2rem;
+    max-width: 280px; text-align: center; color: white; margin-bottom: 2rem;
+  }
+  .float-card-emoji { font-size: 2.5rem; margin-bottom: 0.8rem; display: block; }
+  .float-card-name { font-family: 'Playfair Display', serif; font-size: 1.1rem; margin-bottom: 0.3rem; }
+  .float-card-sub { font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 1rem; }
+  .float-card-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; justify-content: center; }
+  .float-tag {
+    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.7); font-size: 0.62rem; letter-spacing: 0.1em;
+    text-transform: uppercase; padding: 0.2rem 0.65rem; border-radius: 100px;
+  }
+  .hero-right-deco {
+    position: absolute; top: 3rem; right: 3rem;
+    font-family: 'Playfair Display', serif; font-style: italic;
+    font-size: 0.72rem; color: rgba(255,255,255,0.25);
+    writing-mode: vertical-rl; letter-spacing: 0.05em;
+  }
+
+  /* BAND */
+  .band { background: var(--ink); padding: 1rem 0; overflow: hidden; }
+  .band-inner { display: flex; gap: 3rem; animation: ticker 22s linear infinite; white-space: nowrap; }
+  .band-item {
+    font-family: 'Playfair Display', serif; font-style: italic;
+    font-size: 0.88rem; color: rgba(255,255,255,0.4);
+    display: flex; align-items: center; gap: 1rem; flex-shrink: 0;
+  }
+  .band-dot { color: var(--gold); font-style: normal; font-size: 0.45rem; }
+  @keyframes ticker { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+  /* SECTIONS */
+  section { padding: 7rem 4rem; }
+
+  .eyebrow {
+    font-size: 0.68rem; letter-spacing: 0.35em; text-transform: uppercase;
+    color: var(--terracotta); margin-bottom: 1rem;
+    display: flex; align-items: center; gap: 0.8rem;
+  }
+  .eyebrow::before { content: ''; width: 24px; height: 1px; background: var(--terracotta); }
+
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 3.5vw, 3rem);
+    font-weight: 400; line-height: 1.15; margin-bottom: 1rem;
+  }
+  h2 em { font-style: italic; color: var(--terracotta); }
+
+  .intro-text { font-size: 0.95rem; color: var(--stone); line-height: 1.8; max-width: 440px; margin-bottom: 3.5rem; }
+
+  /* HOW IT WORKS */
+  .how-section { background: var(--parchment); }
+  .how-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: var(--border); }
+
+  .how-card {
+    background: var(--warm-white); padding: 3.5rem;
+    position: relative; overflow: hidden; transition: background 0.3s;
+  }
+  .how-card:hover { background: var(--gold-pale); }
+
+  .how-num {
+    font-family: 'Playfair Display', serif; font-style: italic;
+    font-size: 6rem; font-weight: 400; color: var(--border);
+    line-height: 1; position: absolute; top: 1.5rem; right: 2rem; pointer-events: none;
+  }
+
+  .how-icon {
+    width: 52px; height: 52px; border-radius: 50%;
+    border: 1px solid var(--border); display: flex;
+    align-items: center; justify-content: center;
+    font-size: 1.2rem; margin-bottom: 1.8rem; background: var(--blush);
+  }
+
+  .how-card h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 500; margin-bottom: 0.8rem; }
+  .how-card > p { color: var(--stone); line-height: 1.75; font-size: 0.9rem; margin-bottom: 2rem; }
+
+  .step-list { list-style: none; }
+  .step-list li {
+    display: flex; gap: 1rem; align-items: flex-start;
+    padding: 0.75rem 0; border-bottom: 1px solid var(--border);
+    font-size: 0.85rem; color: var(--ink-soft); line-height: 1.5;
+  }
+  .step-list li:last-child { border: none; }
+  .step-num { font-family: 'Playfair Display', serif; font-style: italic; font-size: 0.78rem; color: var(--terracotta); min-width: 20px; margin-top: 1px; }
+
+  /* SERVICES */
+  .services-section { background: var(--warm-white); border-top: 1px solid var(--border); }
+  .services-layout { display: grid; grid-template-columns: 1fr 2fr; gap: 5rem; align-items: start; }
+
+  .service-item {
+    display: flex; gap: 1.5rem; align-items: flex-start;
+    padding: 1.8rem 0; border-bottom: 1px solid var(--border);
+    cursor: pointer; transition: all 0.25s; position: relative;
+  }
+  .service-item::before {
+    content: ''; position: absolute; left: -4rem; top: 0; bottom: 0;
+    width: 3px; background: var(--terracotta);
+    transform: scaleY(0); transition: transform 0.3s; transform-origin: top;
+  }
+  .service-item:hover::before { transform: scaleY(1); }
+  .service-item:hover .service-item-title { color: var(--terracotta); }
+
+  .service-glyph {
+    width: 44px; height: 44px; flex-shrink: 0; background: var(--blush);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; transition: background 0.25s;
+  }
+
+  .service-item-title { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 500; margin-bottom: 0.3rem; transition: color 0.25s; }
+  .service-item-desc { font-size: 0.8rem; color: var(--stone); line-height: 1.6; }
+
+  .service-feature {
+    background: var(--forest); border-radius: 4px; padding: 3rem;
+    color: white; position: relative; overflow: hidden; margin-top: 4rem;
+  }
+  .service-feature::before {
+    content: ''; position: absolute; top: -60px; right: -60px;
+    width: 200px; height: 200px; border-radius: 50%;
+    background: rgba(184,151,90,0.15);
+  }
+  .feature-kicker { font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 1.5rem; }
+  .feature-quote { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.4rem; font-weight: 400; line-height: 1.55; color: white; margin-bottom: 2rem; }
+  .feature-author { font-size: 0.78rem; color: rgba(255,255,255,0.5); }
+  .feature-author strong { color: rgba(255,255,255,0.9); display: block; margin-bottom: 0.2rem; font-weight: 500; }
+  .feature-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 2rem; }
+  .feature-tag {
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.6); font-size: 0.65rem; letter-spacing: 0.12em;
+    text-transform: uppercase; padding: 0.3rem 0.85rem; border-radius: 100px;
+  }
+
+  /* PROFILE */
+  .profile-section { background: var(--blush); border-top: 1px solid var(--border); }
+
+  .profile-card {
+    display: grid; grid-template-columns: 270px 1fr; gap: 0;
+    border: 1px solid var(--border); border-radius: 4px;
+    overflow: hidden; max-width: 900px;
+    box-shadow: 0 8px 40px rgba(26,22,16,0.07); margin-top: 3rem;
+  }
+
+  .profile-left {
+    background: var(--forest); padding: 3rem 2.5rem;
+    display: flex; flex-direction: column; align-items: center;
+    text-align: center; color: white;
+  }
+  .profile-pic {
+    width: 100px; height: 100px; border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.08);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.8rem; margin-bottom: 1.5rem;
+  }
+  .profile-name { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 500; margin-bottom: 0.3rem; }
+  .profile-loc { font-size: 0.7rem; color: rgba(255,255,255,0.45); letter-spacing: 0.1em; margin-bottom: 1.8rem; }
+  .profile-stat-row { display: flex; gap: 1.5rem; margin-bottom: 1.8rem; }
+  .p-stat { text-align: center; }
+  .p-stat-val { font-family: 'Playfair Display', serif; font-size: 1.4rem; }
+  .p-stat-label { font-size: 0.58rem; color: rgba(255,255,255,0.38); text-transform: uppercase; letter-spacing: 0.15em; margin-top: 0.2rem; }
+  .profile-tags-col { display: flex; flex-direction: column; gap: 0.4rem; width: 100%; }
+  .ptag {
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14);
+    color: rgba(255,255,255,0.65); font-size: 0.65rem; letter-spacing: 0.1em;
+    text-transform: uppercase; padding: 0.4rem 0.75rem; text-align: center; border-radius: 2px;
+  }
+  .ptag.lit { background: rgba(193,96,58,0.3); border-color: rgba(193,96,58,0.5); color: rgba(255,200,180,0.9); }
+
+  .profile-right { background: white; padding: 3rem 3.5rem; display: flex; flex-direction: column; justify-content: space-between; }
+  .profile-bio { font-size: 0.9rem; color: var(--ink-soft); line-height: 1.85; margin-bottom: 2rem; }
+  .profile-meta-row { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+  .pmeta { display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; color: var(--stone); }
+  .pmeta-dot { width: 6px; height: 6px; background: var(--forest); border-radius: 50%; flex-shrink: 0; }
+
+  /* REQUEST FORM */
+  .request-section { background: var(--parchment); border-top: 1px solid var(--border); }
+  .request-grid { display: grid; grid-template-columns: 5fr 4fr; gap: 6rem; align-items: start; }
+
+  .form-wrap {
+    background: white; border: 1px solid var(--border);
+    border-radius: 4px; padding: 3rem;
+    box-shadow: 0 6px 30px rgba(26,22,16,0.05);
+  }
+
+  .form-group { margin-bottom: 1.4rem; }
+  .form-group label {
+    display: block; font-size: 0.68rem; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--stone); margin-bottom: 0.5rem; font-weight: 500;
+  }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%; background: var(--parchment);
+    border: 1px solid var(--border); color: var(--ink);
+    padding: 0.85rem 1rem; font-family: 'Jost', sans-serif;
+    font-size: 0.88rem; font-weight: 300; border-radius: 2px;
+    outline: none; transition: border-color 0.2s, background 0.2s; appearance: none;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--terracotta); background: white; }
+  .form-group textarea { height: 110px; resize: vertical; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+  .form-submit {
+    width: 100%; background: var(--terracotta); color: white;
+    border: none; padding: 1rem;
+    font-family: 'Jost', sans-serif; font-size: 0.78rem;
+    font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase;
+    cursor: pointer; border-radius: 2px; transition: background 0.25s; margin-top: 0.5rem;
+  }
+  .form-submit:hover { background: var(--ink); }
+
+  .success-note {
+    margin-top: 1rem; padding: 1rem 1.2rem;
+    background: var(--forest-light); border-left: 3px solid var(--forest);
+    font-size: 0.82rem; color: var(--forest); display: none; border-radius: 0 2px 2px 0;
+  }
+  .success-note.show { display: block; }
+
+  .request-aside h3 { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 400; margin-bottom: 1rem; line-height: 1.2; }
+  .request-aside h3 em { color: var(--terracotta); }
+  .request-aside > p { color: var(--stone); line-height: 1.8; font-size: 0.9rem; margin-bottom: 2.5rem; }
+
+  .promise-list { list-style: none; }
+  .promise-item { display: flex; gap: 1.2rem; padding: 1.2rem 0; border-bottom: 1px solid var(--border); align-items: flex-start; }
+  .promise-item:last-child { border: none; }
+  .promise-icon {
+    width: 36px; height: 36px; flex-shrink: 0; background: var(--blush);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem;
+  }
+  .promise-title { font-size: 0.85rem; font-weight: 600; color: var(--ink); margin-bottom: 0.2rem; }
+  .promise-desc { font-size: 0.8rem; color: var(--stone); line-height: 1.6; }
+
+  /* TESTIMONIALS */
+  .testi-section { background: var(--warm-white); border-top: 1px solid var(--border); }
+  .testi-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; margin-top: 3rem; }
+
+  .testi-card {
+    background: var(--parchment); padding: 2.2rem; border-radius: 2px;
+    position: relative; transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .testi-card:hover { transform: translateY(-5px); box-shadow: 0 12px 40px rgba(26,22,16,0.08); }
+  .testi-card:nth-child(2) { background: var(--forest); color: white; margin-top: -1.5rem; }
+  .testi-card:nth-child(2) .testi-body { color: rgba(255,255,255,0.65); }
+  .testi-card:nth-child(2) .testi-author { color: white; }
+  .testi-card:nth-child(2) .testi-role { color: rgba(255,255,255,0.4); }
+  .testi-card:nth-child(2) .quote-mark { color: rgba(184,151,90,0.45); }
+
+  .quote-mark { font-family: 'Playfair Display', serif; font-size: 3.5rem; color: var(--stone-light); line-height: 0.7; display: block; margin-bottom: 1.2rem; }
+  .testi-body { font-size: 0.88rem; font-style: italic; color: var(--ink-soft); line-height: 1.75; margin-bottom: 1.5rem; }
+  .testi-author { font-size: 0.8rem; font-weight: 600; }
+  .testi-role { font-size: 0.72rem; color: var(--stone); margin-top: 0.15rem; }
+
+  /* FOOTER */
+  footer { background: var(--ink); color: white; padding: 5rem 4rem 2.5rem; }
+  .footer-top { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 4rem; margin-bottom: 4rem; }
+  .footer-logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; letter-spacing: 0.12em; color: white; margin-bottom: 1rem; display: block; }
+  .footer-about { color: rgba(255,255,255,0.32); font-size: 0.82rem; line-height: 1.7; max-width: 220px; }
+  .footer-col h4 { font-size: 0.62rem; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(255,255,255,0.28); margin-bottom: 1.3rem; }
+  .footer-col ul { list-style: none; }
+  .footer-col li { margin-bottom: 0.65rem; }
+  .footer-col a { color: rgba(255,255,255,0.45); text-decoration: none; font-size: 0.85rem; transition: color 0.2s; }
+  .footer-col a:hover { color: white; }
+  .footer-bottom { display: flex; justify-content: space-between; align-items: center; padding-top: 2.5rem; border-top: 1px solid rgba(255,255,255,0.07); font-size: 0.72rem; color: rgba(255,255,255,0.22); }
+
+  /* MODAL */
+  .overlay { position: fixed; inset: 0; background: rgba(26,22,16,0.55); backdrop-filter: blur(8px); z-index: 200; display: none; align-items: center; justify-content: center; }
+  .overlay.show { display: flex; }
+  .modal {
+    background: var(--warm-white); border: 1px solid var(--border); border-radius: 4px;
+    padding: 3rem; max-width: 460px; width: 92%;
+    box-shadow: 0 24px 80px rgba(26,22,16,0.2);
+    animation: modalIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both; position: relative;
+  }
+  @keyframes modalIn { from{opacity:0;transform:translateY(16px) scale(0.97)} to{opacity:1;transform:none} }
+  .modal-close {
+    position: absolute; top: 1.2rem; right: 1.2rem; background: var(--parchment);
+    border: 1px solid var(--border); width: 30px; height: 30px; border-radius: 50%;
+    cursor: pointer; font-size: 0.75rem; color: var(--stone);
+    display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+  }
+  .modal-close:hover { background: var(--blush); color: var(--ink); }
+  .modal-eyebrow { font-size: 0.62rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--terracotta); margin-bottom: 0.5rem; }
+  .modal h3 { font-family: 'Playfair Display', serif; font-size: 1.7rem; font-weight: 400; margin-bottom: 0.4rem; }
+  .modal > p { color: var(--stone); font-size: 0.85rem; margin-bottom: 1.8rem; }
+  .modal-tabs { display: flex; gap: 0; margin-bottom: 1.8rem; border: 1px solid var(--border); border-radius: 2px; overflow: hidden; }
+  .m-tab { flex: 1; padding: 0.65rem; background: transparent; border: none; cursor: pointer; font-family: 'Jost', sans-serif; font-size: 0.72rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--stone); transition: all 0.2s; }
+  .m-tab.active { background: var(--terracotta); color: white; }
+  .m-success { text-align: center; padding: 1.5rem; background: var(--forest-light); color: var(--forest); font-size: 0.85rem; display: none; border-radius: 2px; margin-top: 0.5rem; }
+  .m-success.show { display: block; }
+
+  @keyframes fadeUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+
+  @media (max-width: 900px) {
+    nav { padding: 1rem 1.5rem; }
+    nav ul { display: none; }
+    .hero { grid-template-columns: 1fr; }
+    .hero-right { min-height: 340px; }
+    .how-grid, .request-grid, .services-layout { grid-template-columns: 1fr; }
+    .testi-grid { grid-template-columns: 1fr; }
+    .testi-card:nth-child(2) { margin-top: 0; }
+    .footer-top { grid-template-columns: 1fr 1fr; }
+    section { padding: 5rem 1.5rem; }
+    .profile-card { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    .hero-left { padding: 5rem 1.5rem 4rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo-wrap">
+    <span class="logo">NARU</span>
+    <span class="logo-tagline">The Chef Marketplace</span>
+  </div>
+  <ul>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#how">How it Works</a></li>
+    <li><a href="#chefs">Chefs</a></li>
+    <li><button class="nav-btn" onclick="openModal('client')">Post a Request</button></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-left">
+    <div class="hero-kicker"><span class="kicker-line"></span>Independent Chefs. Real Occasions.</div>
+    <h1>Good food finds<br>its <em>people.</em></h1>
+    <p class="hero-body">NARU connects independent chefs — the ones with genuine skill and genuine character — with the dinners, events, markets, and pop-ups that deserve them.</p>
+    <div class="hero-actions">
+      <button class="btn-fill" onclick="openModal('client')">Find a Chef</button>
+      <button class="btn-ghost" onclick="openModal('chef')">Join as a Chef</button>
+    </div>
+    <div class="hero-stats">
+      <div><div class="stat-val">240+</div><div class="stat-label">Independent Chefs</div></div>
+      <div><div class="stat-val">18</div><div class="stat-label">Cuisines</div></div>
+      <div><div class="stat-val">3,400+</div><div class="stat-label">Events Served</div></div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="dot-deco dot-1"></div>
+    <div class="dot-deco dot-2"></div>
+    <div class="dot-deco dot-3"></div>
+    <div class="arch-wrap">
+      <div class="arch arch-1"></div><div class="arch arch-2"></div>
+      <div class="arch arch-3"></div><div class="arch arch-4"></div>
+    </div>
+    <span class="hero-right-deco">chef marketplace · est. 2024</span>
+    <div class="hero-float-card">
+      <span class="float-card-emoji">👨‍🍳</span>
+      <div class="float-card-name">Marco Ellison</div>
+      <div class="float-card-sub">London · Modern European</div>
+      <div class="float-card-tags">
+        <span class="float-tag">Dinner Clubs</span>
+        <span class="float-tag">Pop-Ups</span>
+        <span class="float-tag">Markets</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BAND -->
+<div class="band">
+  <div class="band-inner">
+    <span class="band-item">Private Dining <span class="band-dot">◆</span></span>
+    <span class="band-item">Dinner Clubs <span class="band-dot">◆</span></span>
+    <span class="band-item">Corporate Events <span class="band-dot">◆</span></span>
+    <span class="band-item">Weddings <span class="band-dot">◆</span></span>
+    <span class="band-item">Market Stalls <span class="band-dot">◆</span></span>
+    <span class="band-item">Pop-Up Kitchens <span class="band-dot">◆</span></span>
+    <span class="band-item">Supper Clubs <span class="band-dot">◆</span></span>
+    <span class="band-item">Cooking Classes <span class="band-dot">◆</span></span>
+    <span class="band-item">Private Dining <span class="band-dot">◆</span></span>
+    <span class="band-item">Dinner Clubs <span class="band-dot">◆</span></span>
+    <span class="band-item">Corporate Events <span class="band-dot">◆</span></span>
+    <span class="band-item">Weddings <span class="band-dot">◆</span></span>
+    <span class="band-item">Market Stalls <span class="band-dot">◆</span></span>
+    <span class="band-item">Pop-Up Kitchens <span class="band-dot">◆</span></span>
+    <span class="band-item">Supper Clubs <span class="band-dot">◆</span></span>
+    <span class="band-item">Cooking Classes <span class="band-dot">◆</span></span>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section id="how" class="how-section">
+  <div class="eyebrow">How it Works</div>
+  <h2>Two sides.<br><em>One table.</em></h2>
+  <p class="intro-text">Whether you need a chef or you are one, NARU makes the connection feel effortless — and the outcome exceptional.</p>
+  <div class="how-grid">
+    <div class="how-card">
+      <div class="how-num">01</div>
+      <div class="how-icon">🍽️</div>
+      <h3>For Clients</h3>
+      <p>Tell us about your occasion. We'll find you a chef who fits the brief, the table, and the moment — within 24 hours.</p>
+      <ul class="step-list">
+        <li><span class="step-num">i.</span> Post your event — cuisine, guests, date, budget.</li>
+        <li><span class="step-num">ii.</span> Receive curated chef proposals matched to your brief.</li>
+        <li><span class="step-num">iii.</span> Review profiles, menus, and reviews.</li>
+        <li><span class="step-num">iv.</span> Confirm your chef and enjoy your event.</li>
+      </ul>
+    </div>
+    <div class="how-card">
+      <div class="how-num">02</div>
+      <div class="how-icon">🔪</div>
+      <h3>For Chefs</h3>
+      <p>Your craft deserves an audience. NARU puts your profile in front of the right people — from private hosts to market organisers.</p>
+      <ul class="step-list">
+        <li><span class="step-num">i.</span> Build your profile — menus, style, availability.</li>
+        <li><span class="step-num">ii.</span> Browse open briefs matched to your speciality.</li>
+        <li><span class="step-num">iii.</span> Pitch directly or let clients discover you.</li>
+        <li><span class="step-num">iv.</span> Cook, earn, and grow your reputation.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services" class="services-section">
+  <div class="services-layout">
+    <div>
+      <div class="eyebrow">What We Cover</div>
+      <h2>Every<br><em>culinary</em><br>occasion.</h2>
+      <p class="intro-text" style="margin-bottom:0">From a ten-person dinner to a weekend market stall — NARU covers the full range of what independent chefs do brilliantly.</p>
+    </div>
+    <div>
+      <div class="service-item"><div class="service-glyph">🕯️</div><div><div class="service-item-title">Private Dining & Dinner Clubs</div><div class="service-item-desc">Intimate, chef-led experiences for guests who want something more considered than a restaurant.</div></div></div>
+      <div class="service-item"><div class="service-glyph">🏢</div><div><div class="service-item-title">Corporate Events</div><div class="service-item-desc">Menus built around your company culture — to impress clients or reward a team properly.</div></div></div>
+      <div class="service-item"><div class="service-glyph">💒</div><div><div class="service-item-title">Weddings & Celebrations</div><div class="service-item-desc">Bespoke menus where every detail is shaped around your day.</div></div></div>
+      <div class="service-item"><div class="service-glyph">🏪</div><div><div class="service-item-title">Market Stalls & Festivals</div><div class="service-item-desc">Chefs connect with organisers seeking new food talent. Street food, done with real care.</div></div></div>
+      <div class="service-item"><div class="service-glyph">⚡</div><div><div class="service-item-title">Pop-Up Kitchens</div><div class="service-item-desc">One-night residencies to regular slots. We connect chefs with the venues that want them.</div></div></div>
+    </div>
+  </div>
+  <div class="service-feature">
+    <div class="feature-kicker">A chef on NARU</div>
+    <div class="feature-quote">"NARU gave me the platform I didn't have. Within a month I had three dinner club bookings and a regular market slot."</div>
+    <div class="feature-author"><strong>Priya K.</strong>Independent Chef · Bristol</div>
+    <div class="feature-tags">
+      <span class="feature-tag">South Asian</span>
+      <span class="feature-tag">Dinner Clubs</span>
+      <span class="feature-tag">Market Stalls</span>
+      <span class="feature-tag">Available to book</span>
+    </div>
+  </div>
+</section>
+
+<!-- PROFILE -->
+<section id="chefs" class="profile-section">
+  <div class="eyebrow">Chef Profiles</div>
+  <h2>Real chefs.<br><em>Real stories.</em></h2>
+  <div class="profile-card">
+    <div class="profile-left">
+      <div class="profile-pic">👨‍🍳</div>
+      <div class="profile-name">Marco Ellison</div>
+      <div class="profile-loc">London, UK · Since 2021</div>
+      <div class="profile-stat-row">
+        <div class="p-stat"><div class="p-stat-val">48</div><div class="p-stat-label">Events</div></div>
+        <div class="p-stat"><div class="p-stat-val">4.9</div><div class="p-stat-label">Rating</div></div>
+      </div>
+      <div class="profile-tags-col">
+        <span class="ptag lit">Modern European</span>
+        <span class="ptag lit">Dinner Clubs</span>
+        <span class="ptag">Market Stalls</span>
+        <span class="ptag">Pop-Ups</span>
+        <span class="ptag">Corporate</span>
+      </div>
+    </div>
+    <div class="profile-right">
+      <div>
+        <p class="profile-bio">Trained in classical French technique across a decade in Michelin-starred kitchens, I'm now building something entirely my own. I run intimate dinner clubs, take spots at local markets, and take on bespoke event work where the brief genuinely excites me. Seasonal ingredients, honest cooking — nothing superfluous.</p>
+        <div class="profile-meta-row">
+          <span class="pmeta"><span class="pmeta-dot"></span> Available to book</span>
+          <span class="pmeta"><span class="pmeta-dot"></span> Weekends open</span>
+          <span class="pmeta"><span class="pmeta-dot"></span> Responds within 48hrs</span>
+        </div>
+      </div>
+      <div style="margin-top:2.5rem; padding-top:2rem; border-top:1px solid var(--border)">
+        <button class="btn-fill" onclick="openModal('client')" style="font-size:0.72rem">Enquire with Marco</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FORM -->
+<section class="request-section" id="request">
+  <div class="request-grid">
+    <div class="form-wrap">
+      <div class="eyebrow">Post a Request</div>
+      <h2 style="font-size:1.6rem; margin-bottom:2rem">Tell us about<br><em>your occasion.</em></h2>
+      <div class="form-group"><label>Type of Event</label><select><option>Private Dinner / Dinner Club</option><option>Corporate Event</option><option>Wedding or Celebration</option><option>Market Stall / Festival</option><option>Pop-Up Kitchen</option><option>Cooking Class or Experience</option></select></div>
+      <div class="form-row">
+        <div class="form-group"><label>Guest Count</label><input type="number" placeholder="e.g. 24"></div>
+        <div class="form-group"><label>Date</label><input type="date"></div>
+      </div>
+      <div class="form-group"><label>Cuisine Style / Dietary Needs</label><input type="text" placeholder="e.g. Modern British, plant-based friendly"></div>
+      <div class="form-group"><label>Budget</label><select><option>Under £500</option><option>£500 – £1,500</option><option>£1,500 – £5,000</option><option>£5,000+</option><option>Flexible — let's talk</option></select></div>
+      <div class="form-group"><label>Tell us more</label><textarea placeholder="Any details about the event, atmosphere, specific dishes, or ideas..."></textarea></div>
+      <div class="form-group"><label>Your Email</label><input type="email" placeholder="you@example.com"></div>
+      <button class="form-submit" onclick="document.getElementById('inlineOk').classList.add('show')">Submit Request</button>
+      <div class="success-note" id="inlineOk">Your request has been received. We'll match you with chefs within 24 hours.</div>
+    </div>
+    <div class="request-aside">
+      <h3>Why <em>NARU?</em></h3>
+      <p>We're not a listing site. Every chef is vetted, every brief is read by a real person, and every match is made with care — not just availability.</p>
+      <ul class="promise-list">
+        <li class="promise-item"><div class="promise-icon">✓</div><div><div class="promise-title">Curated chef network</div><div class="promise-desc">Every chef is verified — qualifications, experience, and references checked before they join.</div></div></li>
+        <li class="promise-item"><div class="promise-icon">⚡</div><div><div class="promise-title">24-hour matching</div><div class="promise-desc">Post your brief and receive tailored proposals the same working day.</div></div></li>
+        <li class="promise-item"><div class="promise-icon">💬</div><div><div class="promise-title">A real person reads every brief</div><div class="promise-desc">No algorithm-only matching. Our team reviews every request before we connect you.</div></div></li>
+        <li class="promise-item"><div class="promise-icon">£</div><div><div class="promise-title">Transparent pricing</div><div class="promise-desc">Chefs set their own rates. You see them upfront. No hidden fees, ever.</div></div></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testi-section">
+  <div class="eyebrow">From the Table</div>
+  <h2>What they're <em>saying.</em></h2>
+  <div class="testi-grid">
+    <div class="testi-card">
+      <span class="quote-mark">"</span>
+      <p class="testi-body">The chef NARU matched us with transformed our company away day. Genuinely exceptional food — it became the highlight of the whole trip.</p>
+      <div class="testi-author">Sarah M.</div>
+      <div class="testi-role">Head of People · Tech Startup, London</div>
+    </div>
+    <div class="testi-card">
+      <span class="quote-mark">"</span>
+      <p class="testi-body">I've hosted dinner parties for years but always struggled to find reliable chef help for larger events. NARU found me a perfect match in a day.</p>
+      <div class="testi-author">James R.</div>
+      <div class="testi-role">Private Client · Surrey</div>
+    </div>
+    <div class="testi-card">
+      <span class="quote-mark">"</span>
+      <p class="testi-body">As a chef just starting out, NARU gave me the platform I didn't have. Three dinner club bookings and a regular market slot within my first month.</p>
+      <div class="testi-author">Priya K.</div>
+      <div class="testi-role">Independent Chef · Bristol</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div>
+      <span class="footer-logo">NARU</span>
+      <p class="footer-about">Connecting independent chefs with the people and occasions that deserve them.</p>
+    </div>
+    <div class="footer-col"><h4>For Clients</h4><ul><li><a href="#">Post a Request</a></li><li><a href="#">Browse Chefs</a></li><li><a href="#">How it Works</a></li><li><a href="#">Pricing Guide</a></li></ul></div>
+    <div class="footer-col"><h4>For Chefs</h4><ul><li><a href="#">Join NARU</a></li><li><a href="#">Build Your Profile</a></li><li><a href="#">Browse Requests</a></li><li><a href="#">Chef Resources</a></li></ul></div>
+    <div class="footer-col"><h4>Company</h4><ul><li><a href="#">About</a></li><li><a href="#">Blog</a></li><li><a href="#">Contact</a></li><li><a href="#">Privacy</a></li></ul></div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 NARU Ltd. All rights reserved.</span>
+    <span>Good food. Properly connected.</span>
+  </div>
+</footer>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-eyebrow">Welcome to NARU</div>
+    <h3>Get started</h3>
+    <p>Tell us who you are and we'll get you set up right away.</p>
+    <div class="modal-tabs">
+      <button class="m-tab active" id="mt-client" onclick="switchTab('client')">I Need a Chef</button>
+      <button class="m-tab" id="mt-chef" onclick="switchTab('chef')">I'm a Chef</button>
+    </div>
+    <div id="mc-client">
+      <div class="form-group"><label>Your Name</label><input type="text" placeholder="First and last name"></div>
+      <div class="form-group"><label>Email</label><input type="email" placeholder="you@example.com"></div>
+      <div class="form-group"><label>Event Type</label><select><option>Private Dinner</option><option>Corporate</option><option>Wedding</option><option>Market / Festival</option><option>Pop-Up</option></select></div>
+      <button class="form-submit" onclick="showSuccess()" style="margin-top:0.5rem">Continue</button>
+    </div>
+    <div id="mc-chef" style="display:none">
+      <div class="form-group"><label>Your Name</label><input type="text" placeholder="First and last name"></div>
+      <div class="form-group"><label>Email</label><input type="email" placeholder="you@example.com"></div>
+      <div class="form-group"><label>Speciality</label><input type="text" placeholder="e.g. Modern European, Street Food"></div>
+      <button class="form-submit" onclick="showSuccess()" style="margin-top:0.5rem">Apply to Join</button>
+    </div>
+    <div class="m-success" id="m-ok">Your details have been received. We'll be in touch within 24 hours.</div>
+  </div>
+</div>
+
+<script>
+  function openModal(t) {
+    document.getElementById('overlay').classList.add('show');
+    document.getElementById('m-ok').classList.remove('show');
+    switchTab(t);
+  }
+  function closeModal() { document.getElementById('overlay').classList.remove('show'); }
+  function switchTab(t) {
+    document.getElementById('mt-client').classList.toggle('active', t==='client');
+    document.getElementById('mt-chef').classList.toggle('active', t==='chef');
+    document.getElementById('mc-client').style.display = t==='client' ? 'block' : 'none';
+    document.getElementById('mc-chef').style.display = t==='chef' ? 'block' : 'none';
+  }
+  function showSuccess() {
+    document.getElementById('mc-client').style.display = 'none';
+    document.getElementById('mc-chef').style.display = 'none';
+    document.getElementById('m-ok').classList.add('show');
+  }
+  document.getElementById('overlay').addEventListener('click', e => {
+    if(e.target === document.getElementById('overlay')) closeModal();
+  });
+  document.querySelectorAll('a[href="#"]').forEach(a => a.addEventListener('click', e => e.preventDefault()));
+</script>
+</body>
+</html>
