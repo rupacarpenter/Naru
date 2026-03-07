@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — NARU</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--cream:#FDFAF4;--warm:#F4EDE0;--spice:#B85C2C;--forest:#354D3C;--ink:#1C1610;--stone:#7C7060;--gold:#C4913A;--border:rgba(28,22,16,0.1);}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--cream);color:var(--ink);font-family:'Jost',sans-serif;font-weight:300;min-height:100vh;}
+  .login-screen{position:fixed;inset:0;background:var(--ink);display:flex;align-items:center;justify-content:center;z-index:100;}
+  .login-screen.hide{display:none;}
+  .login-box{background:var(--cream);border-radius:4px;padding:2.8rem;width:min(380px,90vw);text-align:center;}
+  .login-logo{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;letter-spacing:0.18em;margin-bottom:0.3rem;}
+  .login-sub{font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--stone);margin-bottom:2rem;}
+  .login-box input{width:100%;background:var(--warm);border:1px solid var(--border);color:var(--ink);padding:0.85rem 1rem;font-family:'Jost',sans-serif;font-size:0.9rem;border-radius:2px;outline:none;text-align:center;letter-spacing:0.15em;margin-bottom:0.8rem;transition:border-color 0.2s;}
+  .login-box input:focus{border-color:var(--spice);background:white;}
+  .login-btn{width:100%;background:var(--spice);color:white;border:none;padding:0.9rem;font-family:'Jost',sans-serif;font-size:0.74rem;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:background 0.2s;}
+  .login-btn:hover{background:#8f4420;}
+  .login-error{font-size:0.75rem;color:#c0392b;margin-top:0.5rem;display:none;}
+  .login-error.show{display:block;}
+  .admin-ui{display:none;}
+  .admin-ui.show{display:block;}
+  nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem 2.5rem;border-bottom:1px solid var(--border);background:var(--cream);position:sticky;top:0;z-index:10;}
+  .logo{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;letter-spacing:0.16em;}
+  .logo-line{font-size:0.52rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--stone);display:block;margin-top:1px;}
+  .nav-right{display:flex;gap:1.5rem;align-items:center;}
+  nav a{color:var(--stone);text-decoration:none;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:500;transition:color 0.2s;}
+  nav a:hover{color:var(--spice);}
+  .nav-badge{background:var(--spice);color:white;font-size:0.6rem;padding:0.2rem 0.6rem;border-radius:100px;letter-spacing:0.08em;}
+  .logout-btn{background:none;border:1px solid var(--border);color:var(--stone);padding:0.4rem 0.9rem;border-radius:2px;font-family:'Jost',sans-serif;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;}
+  .logout-btn:hover{border-color:var(--spice);color:var(--spice);}
+  .admin-layout{display:grid;grid-template-columns:1.1fr 0.9fr;min-height:calc(100vh - 60px);}
+  .add-panel{background:var(--warm);border-right:1px solid var(--border);padding:2.5rem 3rem;overflow-y:auto;max-height:calc(100vh - 60px);}
+  .panel-title{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:400;margin-bottom:0.3rem;}
+  .panel-sub{font-size:0.78rem;color:var(--stone);margin-bottom:2rem;line-height:1.6;}
+  .sdiv{font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--spice);margin:1.8rem 0 1.2rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0.6rem;}
+  .sdiv::before{content:'';width:16px;height:1px;background:var(--spice);}
+  .fg{margin-bottom:1.2rem;}
+  .fg label{display:block;font-size:0.6rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--stone);margin-bottom:0.4rem;font-weight:500;}
+  .fg input,.fg select,.fg textarea{width:100%;background:white;border:1px solid var(--border);color:var(--ink);padding:0.8rem 1rem;font-family:'Jost',sans-serif;font-size:0.88rem;font-weight:300;border-radius:2px;outline:none;transition:border-color 0.2s;appearance:none;}
+  .fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--spice);}
+  .fg select option{background:white;}
+  .fg textarea{resize:vertical;line-height:1.7;}
+  .fg-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+  .fg-three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;}
+  /* Ingredients */
+  .ing-header{display:grid;grid-template-columns:80px 1fr 24px;gap:0.5rem;margin-bottom:0.4rem;}
+  .ing-header span{font-size:0.55rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--stone);}
+  .ing-list{display:flex;flex-direction:column;gap:0.5rem;margin-bottom:0.8rem;}
+  .ing-row{display:grid;grid-template-columns:80px 1fr 24px;gap:0.5rem;align-items:center;}
+  .ing-row input{background:white;border:1px solid var(--border);color:var(--ink);padding:0.55rem 0.7rem;font-family:'Jost',sans-serif;font-size:0.82rem;font-weight:300;border-radius:2px;outline:none;width:100%;}
+  .ing-row input:focus{border-color:var(--spice);}
+  .ing-row input.qty{text-align:center;}
+  /* Steps */
+  .step-list{display:flex;flex-direction:column;gap:0.6rem;margin-bottom:0.8rem;}
+  .step-row{display:grid;grid-template-columns:22px 1fr 24px;gap:0.6rem;align-items:flex-start;}
+  .step-num{font-family:'Playfair Display',serif;font-size:0.9rem;color:var(--spice);padding-top:0.55rem;text-align:center;}
+  .step-row textarea{background:white;border:1px solid var(--border);color:var(--ink);padding:0.6rem 0.8rem;font-family:'Jost',sans-serif;font-size:0.82rem;font-weight:300;border-radius:2px;outline:none;resize:vertical;height:68px;line-height:1.6;width:100%;}
+  .step-row textarea:focus{border-color:var(--spice);}
+  .rm{background:none;border:none;color:rgba(28,22,16,0.18);cursor:pointer;font-size:1.1rem;line-height:1;padding:0;transition:color 0.2s;}
+  .rm:hover{color:#c0392b;}
+  .add-row{background:none;border:1px dashed var(--border);color:var(--stone);padding:0.5rem 1rem;border-radius:2px;font-family:'Jost',sans-serif;font-size:0.72rem;letter-spacing:0.08em;cursor:pointer;transition:all 0.2s;width:100%;margin-bottom:0.5rem;}
+  .add-row:hover{border-color:var(--spice);color:var(--spice);}
+  .emoji-preview{font-size:2.2rem;display:inline-block;margin-left:0.8rem;vertical-align:middle;}
+  .save-btn{width:100%;background:var(--spice);color:white;border:none;padding:1rem;font-family:'Jost',sans-serif;font-size:0.78rem;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:background 0.25s;margin-top:0.8rem;}
+  .save-btn:hover{background:#8f4420;}
+  .save-ok{background:#eaf2eb;border:1px solid rgba(53,77,60,0.2);color:var(--forest);padding:0.9rem;text-align:center;font-size:0.8rem;border-radius:2px;display:none;margin-top:0.8rem;line-height:1.6;}
+  .save-ok.show{display:block;}
+  /* List panel */
+  .list-panel{background:var(--cream);padding:2.5rem;overflow-y:auto;max-height:calc(100vh - 60px);}
+  .list-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:1.5rem;}
+  .list-title{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:400;}
+  .list-count{font-size:0.72rem;color:var(--stone);}
+  .rr{display:flex;align-items:center;gap:1rem;padding:1rem 0;border-bottom:1px solid var(--border);}
+  .rr:last-child{border:none;}
+  .rr-thumb{width:44px;height:44px;border-radius:4px;background:var(--warm);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+  .rr-info{flex:1;min-width:0;}
+  .rr-name{font-family:'Playfair Display',serif;font-size:0.9rem;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .rr-meta{font-size:0.65rem;color:var(--stone);margin-top:0.2rem;}
+  .rr-cat{display:inline-block;background:var(--warm);border:1px solid var(--border);font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.12rem 0.45rem;border-radius:100px;color:var(--stone);margin-right:0.3rem;}
+  .rr-del{background:none;border:1px solid var(--border);color:var(--stone);padding:0.3rem 0.7rem;border-radius:2px;font-size:0.6rem;font-family:'Jost',sans-serif;cursor:pointer;transition:all 0.2s;flex-shrink:0;}
+  .rr-del:hover{border-color:#c0392b;color:#c0392b;}
+  .empty-list{text-align:center;padding:4rem 1rem;}
+  .el-icon{font-size:2.5rem;margin-bottom:0.8rem;}
+  .empty-list p{font-size:0.82rem;color:var(--stone);line-height:1.7;}
+  @media(max-width:900px){.admin-layout{grid-template-columns:1fr;}.add-panel,.list-panel{max-height:none;padding:2rem 1.5rem;}nav{padding:1rem 1.5rem;}.fg-row,.fg-three,.ing-row,.ing-header{grid-template-columns:1fr;}.ing-row{grid-template-columns:80px 1fr 24px;}}
+</style>
+</head>
+<body>
+
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">NARU</div>
+    <div class="login-sub">Admin Access</div>
+    <input type="password" id="pwInput" placeholder="Enter password" onkeydown="if(event.key==='Enter')tryLogin()">
+    <button class="login-btn" onclick="tryLogin()">Enter</button>
+    <div class="login-error" id="loginError">Incorrect password. Try again.</div>
+  </div>
+</div>
+
+<div class="admin-ui" id="adminUi">
+  <nav>
+    <div><span class="logo">NARU</span><span class="logo-line">Admin</span></div>
+    <div class="nav-right">
+      <a href="index.html">← Homepage</a>
+      <a href="recipes.html">View Recipes</a>
+      <span class="nav-badge" id="recipeCount">0 recipes</span>
+      <button class="logout-btn" onclick="logout()">Log out</button>
+    </div>
+  </nav>
+
+  <div class="admin-layout">
+
+    <div class="add-panel">
+      <div class="panel-title">Add a Recipe</div>
+      <p class="panel-sub">Fill in everything below and hit Save — it appears on the site instantly.</p>
+
+      <div class="sdiv">The Basics</div>
+
+      <div class="fg"><label>Recipe Title *</label><input type="text" id="f-title" placeholder="e.g. Homemade Crackers"></div>
+      <div class="fg"><label>Short Description</label><textarea id="f-desc" style="height:70px" placeholder="A sentence or two about the dish..."></textarea></div>
+
+      <div class="fg-row">
+        <div class="fg"><label>Category *</label>
+          <select id="f-cat">
+            <option>Bread & Baking</option><option>Fermentation</option><option>Mains</option>
+            <option>Breakfast</option><option>Condiments</option><option>Desserts</option>
+            <option>Snacks</option><option>Soups</option>
+          </select>
+        </div>
+        <div class="fg"><label>Emoji thumbnail</label>
+          <div style="display:flex;align-items:center">
+            <input type="text" id="f-emoji" placeholder="🍞" style="width:80px" oninput="document.getElementById('ep').textContent=this.value||'🍽️'">
+            <span class="emoji-preview" id="ep">🍽️</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="fg-three">
+        <div class="fg"><label>Cook Time *</label><input type="text" id="f-time" placeholder="25 min"></div>
+        <div class="fg"><label>Servings</label><input type="text" id="f-servings" placeholder="4 people"></div>
+        <div class="fg"><label>Difficulty</label>
+          <select id="f-diff"><option>Easy</option><option>Intermediate</option><option>Advanced</option></select>
+        </div>
+      </div>
+
+      <div class="sdiv">Ingredients</div>
+      <div class="ing-header"><span>Amount</span><span>Ingredient</span><span></span></div>
+      <div class="ing-list" id="ing-list"></div>
+      <button class="add-row" onclick="addIng()">+ Add ingredient</button>
+
+      <div class="sdiv">Method</div>
+      <div class="step-list" id="step-list"></div>
+      <button class="add-row" onclick="addStep()">+ Add step</button>
+
+      <div class="sdiv">Notes <span style="font-size:0.55rem;color:var(--stone);letter-spacing:0.1em;font-style:normal">(optional)</span></div>
+      <div class="fg"><textarea id="f-notes" style="height:80px" placeholder="Tips, variations, things to watch out for..."></textarea></div>
+
+      <button class="save-btn" onclick="saveRecipe()">Save Recipe →</button>
+      <div class="save-ok" id="saveOk">✓ Recipe saved! It's now live on the recipes page.</div>
+    </div>
+
+    <div class="list-panel">
+      <div class="list-header">
+        <div class="list-title">Your Recipes</div>
+        <div class="list-count" id="listCount"></div>
+      </div>
+      <div id="recipeList"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const KEY = 'naru_recipes';
+  const PW = 'naru2026';
+
+  function getRecipes(){ try{return JSON.parse(localStorage.getItem(KEY))||[];}catch(e){return[];} }
+  function setRecipes(r){ localStorage.setItem(KEY,JSON.stringify(r)); }
+
+  function tryLogin(){
+    if(document.getElementById('pwInput').value===PW){
+      document.getElementById('loginScreen').classList.add('hide');
+      document.getElementById('adminUi').classList.add('show');
+      sessionStorage.setItem('naru_auth','1');
+      init();
+    } else {
+      document.getElementById('loginError').classList.add('show');
+      document.getElementById('pwInput').value='';
+    }
+  }
+  function logout(){ sessionStorage.removeItem('naru_auth'); location.reload(); }
+
+  function addIng(qty='',name=''){
+    const row=document.createElement('div'); row.className='ing-row';
+    row.innerHTML=`<input type="text" class="qty" placeholder="200g" value="${qty}"><input type="text" placeholder="plain flour" value="${name}"><button class="rm" onclick="this.parentElement.remove()">×</button>`;
+    document.getElementById('ing-list').appendChild(row);
+  }
+
+  function addStep(text=''){
+    const list=document.getElementById('step-list');
+    const n=list.children.length+1;
+    const row=document.createElement('div'); row.className='step-row';
+    row.innerHTML=`<div class="step-num">${n}</div><textarea placeholder="Describe this step...">${text}</textarea><button class="rm" onclick="removeStep(this)">×</button>`;
+    list.appendChild(row);
+  }
+  function removeStep(btn){ btn.parentElement.remove(); document.querySelectorAll('.step-num').forEach((el,i)=>el.textContent=i+1); }
+
+  function saveRecipe(){
+    const title=document.getElementById('f-title').value.trim();
+    const cookTime=document.getElementById('f-time').value.trim();
+    if(!title||!cookTime){alert('Please fill in at least a title and cook time.');return;}
+
+    const ingredients=[];
+    document.querySelectorAll('.ing-row').forEach(r=>{
+      const inputs=r.querySelectorAll('input');
+      const name=inputs[1].value.trim();
+      if(name) ingredients.push({qty:inputs[0].value.trim(),name});
+    });
+
+    const steps=[];
+    document.querySelectorAll('.step-row textarea').forEach(t=>{ if(t.value.trim()) steps.push(t.value.trim()); });
+
+    const recipe={
+      id:Date.now(), title,
+      description:document.getElementById('f-desc').value.trim(),
+      category:document.getElementById('f-cat').value,
+      emoji:document.getElementById('f-emoji').value.trim()||'🍽️',
+      cookTime, servings:document.getElementById('f-servings').value.trim(),
+      difficulty:document.getElementById('f-diff').value,
+      ingredients, steps,
+      notes:document.getElementById('f-notes').value.trim(),
+      addedAt:new Date().toISOString()
+    };
+
+    const recipes=getRecipes(); recipes.unshift(recipe); setRecipes(recipes);
+
+    // reset form
+    ['f-title','f-desc','f-emoji','f-time','f-servings','f-notes'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('ep').textContent='🍽️';
+    document.getElementById('f-cat').selectedIndex=0;
+    document.getElementById('f-diff').selectedIndex=0;
+    document.getElementById('ing-list').innerHTML='';
+    document.getElementById('step-list').innerHTML='';
+    addIng();addIng();addIng();addStep();addStep();
+
+    const ok=document.getElementById('saveOk'); ok.classList.add('show'); setTimeout(()=>ok.classList.remove('show'),3000);
+    renderList();
+  }
+
+  function renderList(){
+    const recipes=getRecipes(); const c=recipes.length;
+    document.getElementById('recipeCount').textContent=c+' recipe'+(c!==1?'s':'');
+    document.getElementById('listCount').textContent=c+' total';
+    const el=document.getElementById('recipeList');
+    if(!c){el.innerHTML='<div class="empty-list"><div class="el-icon">🍳</div><p>No recipes yet — add your first one using the form.</p></div>';return;}
+    el.innerHTML=recipes.map((r,i)=>`
+      <div class="rr">
+        <div class="rr-thumb">${r.emoji}</div>
+        <div class="rr-info">
+          <div class="rr-name">${r.title}</div>
+          <div class="rr-meta"><span class="rr-cat">${r.category}</span>⏱ ${r.cookTime} · ${r.difficulty}${r.ingredients&&r.ingredients.length?' · '+r.ingredients.length+' ingredients':''}</div>
+        </div>
+        <button class="rr-del" onclick="delRecipe(${i})">Remove</button>
+      </div>`).join('');
+  }
+
+  function delRecipe(i){
+    if(!confirm('Remove "'+getRecipes()[i].title+'"?'))return;
+    const r=getRecipes(); r.splice(i,1); setRecipes(r); renderList();
+  }
+
+  function init(){ renderList(); if(!document.getElementById('ing-list').children.length){addIng();addIng();addIng();} if(!document.getElementById('step-list').children.length){addStep();addStep();} }
+
+  if(sessionStorage.getItem('naru_auth')==='1'){ document.getElementById('loginScreen').classList.add('hide'); document.getElementById('adminUi').classList.add('show'); init(); }
+</script>
+</body>
+</html>
