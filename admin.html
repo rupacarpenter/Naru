@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — NARU</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--cream:#FDFAF4;--warm:#F4EDE0;--spice:#B85C2C;--forest:#354D3C;--ink:#1C1610;--stone:#7C7060;--gold:#C4913A;--border:rgba(28,22,16,0.1);}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--cream);color:var(--ink);font-family:'Jost',sans-serif;font-weight:300;min-height:100vh;}
+
+  /* LOGIN SCREEN */
+  .login-screen{position:fixed;inset:0;background:var(--ink);display:flex;align-items:center;justify-content:center;z-index:100;}
+  .login-screen.hide{display:none;}
+  .login-box{background:var(--cream);border-radius:4px;padding:2.8rem;width:min(380px,90vw);text-align:center;}
+  .login-logo{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;letter-spacing:0.18em;margin-bottom:0.3rem;}
+  .login-sub{font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--stone);margin-bottom:2rem;}
+  .login-box input{width:100%;background:var(--warm);border:1px solid var(--border);color:var(--ink);padding:0.85rem 1rem;font-family:'Jost',sans-serif;font-size:0.9rem;border-radius:2px;outline:none;text-align:center;letter-spacing:0.15em;margin-bottom:0.8rem;transition:border-color 0.2s;}
+  .login-box input:focus{border-color:var(--spice);background:white;}
+  .login-btn{width:100%;background:var(--spice);color:white;border:none;padding:0.9rem;font-family:'Jost',sans-serif;font-size:0.74rem;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:background 0.2s;}
+  .login-btn:hover{background:#8f4420;}
+  .login-error{font-size:0.75rem;color:#c0392b;margin-top:0.5rem;display:none;}
+  .login-error.show{display:block;}
+
+  /* ADMIN UI */
+  .admin-ui{display:none;}
+  .admin-ui.show{display:block;}
+
+  nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem 2.5rem;border-bottom:1px solid var(--border);background:var(--cream);position:sticky;top:0;z-index:10;}
+  .logo{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;letter-spacing:0.16em;}
+  .logo-line{font-size:0.52rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--stone);display:block;margin-top:1px;}
+  .nav-right{display:flex;gap:1.5rem;align-items:center;}
+  nav a{color:var(--stone);text-decoration:none;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:500;transition:color 0.2s;}
+  nav a:hover{color:var(--spice);}
+  .nav-badge{background:var(--spice);color:white;font-size:0.6rem;padding:0.2rem 0.6rem;border-radius:100px;letter-spacing:0.08em;}
+  .logout-btn{background:none;border:1px solid var(--border);color:var(--stone);padding:0.4rem 0.9rem;border-radius:2px;font-family:'Jost',sans-serif;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;}
+  .logout-btn:hover{border-color:var(--spice);color:var(--spice);}
+
+  .admin-layout{display:grid;grid-template-columns:1fr 1fr;gap:0;min-height:calc(100vh - 60px);}
+
+  /* ADD FORM */
+  .add-panel{background:var(--warm);border-right:1px solid var(--border);padding:2.5rem 3rem;overflow-y:auto;}
+  .panel-title{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:400;margin-bottom:0.3rem;}
+  .panel-sub{font-size:0.78rem;color:var(--stone);margin-bottom:2rem;line-height:1.6;}
+
+  .fg{margin-bottom:1.2rem;}
+  .fg label{display:block;font-size:0.6rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--stone);margin-bottom:0.4rem;font-weight:500;}
+  .fg input,.fg select,.fg textarea{width:100%;background:white;border:1px solid var(--border);color:var(--ink);padding:0.8rem 1rem;font-family:'Jost',sans-serif;font-size:0.88rem;font-weight:300;border-radius:2px;outline:none;transition:border-color 0.2s,box-shadow 0.2s;appearance:none;}
+  .fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--spice);box-shadow:0 0 0 3px rgba(184,92,44,0.08);}
+  .fg select option{background:white;}
+  .fg textarea{height:90px;resize:vertical;line-height:1.6;}
+  .fg-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+  .fg-three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;}
+
+  .emoji-preview{font-size:2.5rem;display:inline-block;margin-left:0.8rem;vertical-align:middle;}
+
+  .save-btn{width:100%;background:var(--spice);color:white;border:none;padding:1rem;font-family:'Jost',sans-serif;font-size:0.78rem;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:background 0.25s;margin-top:0.5rem;}
+  .save-btn:hover{background:#8f4420;}
+  .save-confirm{background:#eaf2eb;border:1px solid rgba(53,77,60,0.2);color:var(--forest);padding:0.9rem;text-align:center;font-size:0.8rem;border-radius:2px;display:none;margin-top:0.8rem;line-height:1.6;}
+  .save-confirm.show{display:block;}
+
+  /* RECIPE LIST */
+  .list-panel{background:var(--cream);padding:2.5rem 3rem;overflow-y:auto;}
+  .list-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:1.5rem;}
+  .list-title{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:400;}
+  .list-count{font-size:0.72rem;color:var(--stone);letter-spacing:0.08em;}
+
+  .recipe-row{display:flex;align-items:center;gap:1rem;padding:1rem 0;border-bottom:1px solid var(--border);}
+  .recipe-row:last-child{border:none;}
+  .rr-thumb{width:44px;height:44px;border-radius:4px;background:var(--warm);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+  .rr-info{flex:1;min-width:0;}
+  .rr-title{font-family:'Playfair Display',serif;font-size:0.9rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .rr-meta{font-size:0.65rem;color:var(--stone);margin-top:0.15rem;}
+  .rr-cat{display:inline-block;background:var(--warm);border:1px solid var(--border);font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;padding:0.15rem 0.5rem;border-radius:100px;color:var(--stone);margin-right:0.4rem;}
+  .rr-del{background:none;border:1px solid var(--border);color:var(--stone);padding:0.3rem 0.7rem;border-radius:2px;font-size:0.6rem;font-family:'Jost',sans-serif;letter-spacing:0.08em;cursor:pointer;transition:all 0.2s;flex-shrink:0;}
+  .rr-del:hover{border-color:#c0392b;color:#c0392b;background:#fff5f5;}
+
+  .empty-list{text-align:center;padding:4rem 1rem;}
+  .empty-list .el-icon{font-size:2.5rem;margin-bottom:0.8rem;}
+  .empty-list p{font-size:0.82rem;color:var(--stone);line-height:1.7;}
+
+  @media(max-width:768px){
+    .admin-layout{grid-template-columns:1fr;}
+    .add-panel,.list-panel{padding:2rem 1.5rem;}
+    nav{padding:1rem 1.5rem;}
+    .fg-row,.fg-three{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">NARU</div>
+    <div class="login-sub">Admin Access</div>
+    <input type="password" id="pwInput" placeholder="Enter password" onkeydown="if(event.key==='Enter')tryLogin()">
+    <button class="login-btn" onclick="tryLogin()">Enter</button>
+    <div class="login-error" id="loginError">Incorrect password. Try again.</div>
+  </div>
+</div>
+
+<!-- ADMIN UI -->
+<div class="admin-ui" id="adminUi">
+  <nav>
+    <div>
+      <span class="logo">NARU</span>
+      <span class="logo-line">Admin</span>
+    </div>
+    <div class="nav-right">
+      <a href="index.html">← Homepage</a>
+      <a href="recipes.html">View Recipes</a>
+      <span class="nav-badge" id="recipeCount">0 recipes</span>
+      <button class="logout-btn" onclick="logout()">Log out</button>
+    </div>
+  </nav>
+
+  <div class="admin-layout">
+
+    <!-- ADD RECIPE FORM -->
+    <div class="add-panel">
+      <div class="panel-title">Add a Recipe</div>
+      <p class="panel-sub">Fill in the details below and hit Save — it'll appear on the site instantly.</p>
+
+      <div class="fg">
+        <label>Recipe Title *</label>
+        <input type="text" id="f-title" placeholder="e.g. Homemade Crackers">
+      </div>
+      <div class="fg">
+        <label>Short Description</label>
+        <textarea id="f-desc" placeholder="A sentence or two about the recipe..."></textarea>
+      </div>
+      <div class="fg-row">
+        <div class="fg">
+          <label>Category *</label>
+          <select id="f-cat">
+            <option>Bread & Baking</option>
+            <option>Fermentation</option>
+            <option>Mains</option>
+            <option>Breakfast</option>
+            <option>Condiments</option>
+            <option>Desserts</option>
+            <option>Snacks</option>
+            <option>Soups</option>
+            <option>Baking</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Emoji <span style="font-size:0.55rem;color:var(--stone)">(shown as thumbnail)</span></label>
+          <div style="display:flex;align-items:center">
+            <input type="text" id="f-emoji" placeholder="🍞" style="width:80px" oninput="document.getElementById('emojiPreview').textContent=this.value||'🍽️'">
+            <span class="emoji-preview" id="emojiPreview">🍽️</span>
+          </div>
+        </div>
+      </div>
+      <div class="fg-three">
+        <div class="fg">
+          <label>Cook Time *</label>
+          <input type="text" id="f-time" placeholder="e.g. 25 min">
+        </div>
+        <div class="fg">
+          <label>Servings</label>
+          <input type="text" id="f-servings" placeholder="e.g. 4 people">
+        </div>
+        <div class="fg">
+          <label>Difficulty *</label>
+          <select id="f-diff">
+            <option>Easy</option>
+            <option>Intermediate</option>
+            <option>Advanced</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="save-btn" onclick="saveRecipe()">Save Recipe →</button>
+      <div class="save-confirm" id="saveConfirm">
+        ✓ Recipe saved! It's now live on the recipes page.
+      </div>
+    </div>
+
+    <!-- RECIPE LIST -->
+    <div class="list-panel">
+      <div class="list-header">
+        <div class="list-title">Your Recipes</div>
+        <div class="list-count" id="listCount"></div>
+      </div>
+      <div id="recipeList"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const STORAGE_KEY = 'naru_recipes';
+  const PASSWORD = 'naru2026'; // ← change this to your own password
+
+  function getRecipes() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch(e) { return []; } }
+  function saveRecipes(r) { localStorage.setItem(STORAGE_KEY, JSON.stringify(r)); }
+
+  // AUTH
+  function tryLogin() {
+    const pw = document.getElementById('pwInput').value;
+    if (pw === PASSWORD) {
+      document.getElementById('loginScreen').classList.add('hide');
+      document.getElementById('adminUi').classList.add('show');
+      sessionStorage.setItem('naru_auth', '1');
+      renderList();
+    } else {
+      document.getElementById('loginError').classList.add('show');
+      document.getElementById('pwInput').value = '';
+    }
+  }
+  function logout() {
+    sessionStorage.removeItem('naru_auth');
+    document.getElementById('loginScreen').classList.remove('hide');
+    document.getElementById('adminUi').classList.remove('show');
+  }
+  // stay logged in during session
+  if (sessionStorage.getItem('naru_auth') === '1') {
+    document.getElementById('loginScreen').classList.add('hide');
+    document.getElementById('adminUi').classList.add('show');
+  }
+
+  // SAVE
+  function saveRecipe() {
+    const title = document.getElementById('f-title').value.trim();
+    const cookTime = document.getElementById('f-time').value.trim();
+    if (!title || !cookTime) { alert('Please fill in at least a title and cook time.'); return; }
+
+    const recipe = {
+      id: Date.now(),
+      title,
+      description: document.getElementById('f-desc').value.trim(),
+      category: document.getElementById('f-cat').value,
+      emoji: document.getElementById('f-emoji').value.trim() || '🍽️',
+      cookTime,
+      servings: document.getElementById('f-servings').value.trim(),
+      difficulty: document.getElementById('f-diff').value,
+      addedAt: new Date().toISOString()
+    };
+
+    const recipes = getRecipes();
+    recipes.unshift(recipe); // newest first
+    saveRecipes(recipes);
+
+    // reset form
+    ['f-title','f-desc','f-emoji','f-time','f-servings'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('emojiPreview').textContent = '🍽️';
+    document.getElementById('f-cat').selectedIndex = 0;
+    document.getElementById('f-diff').selectedIndex = 0;
+
+    document.getElementById('saveConfirm').classList.add('show');
+    setTimeout(() => document.getElementById('saveConfirm').classList.remove('show'), 3000);
+
+    renderList();
+  }
+
+  // RENDER LIST
+  function renderList() {
+    const recipes = getRecipes();
+    const count = recipes.length;
+    document.getElementById('recipeCount').textContent = count + ' recipe' + (count !== 1 ? 's' : '');
+    document.getElementById('listCount').textContent = count + ' total';
+
+    const el = document.getElementById('recipeList');
+    if (!count) {
+      el.innerHTML = '<div class="empty-list"><div class="el-icon">🍳</div><p>No recipes yet — add your first one using the form.</p></div>';
+      return;
+    }
+    el.innerHTML = recipes.map((r, i) => `
+      <div class="recipe-row">
+        <div class="rr-thumb">${r.emoji}</div>
+        <div class="rr-info">
+          <div class="rr-title">${r.title}</div>
+          <div class="rr-meta"><span class="rr-cat">${r.category}</span>⏱ ${r.cookTime} · ${r.difficulty}</div>
+        </div>
+        <button class="rr-del" onclick="deleteRecipe(${i})">Remove</button>
+      </div>`).join('');
+  }
+
+  function deleteRecipe(i) {
+    if (!confirm('Remove "' + getRecipes()[i].title + '"?')) return;
+    const recipes = getRecipes();
+    recipes.splice(i, 1);
+    saveRecipes(recipes);
+    renderList();
+  }
+
+  // init if already authed
+  if (sessionStorage.getItem('naru_auth') === '1') renderList();
+</script>
+</body>
+</html>
