@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — NARU</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--cream:#FDFAF4;--warm:#F4EDE0;--spice:#B85C2C;--forest:#354D3C;--ink:#1C1610;--stone:#7C7060;--gold:#C4913A;--border:rgba(28,22,16,0.1);}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--cream);color:var(--ink);font-family:'Jost',sans-serif;font-weight:300;min-height:100vh;}
+
+  /* LOGIN */
+  .login-screen{position:fixed;inset:0;background:var(--ink);display:flex;align-items:center;justify-content:center;z-index:100;}
+  .login-screen.hide{display:none;}
+  .login-box{background:var(--cream);border-radius:4px;padding:2.8rem;width:min(380px,90vw);text-align:center;}
+  .login-logo{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;letter-spacing:0.18em;margin-bottom:0.3rem;}
+  .login-sub{font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--stone);margin-bottom:2rem;}
+  .login-box input{width:100%;background:var(--warm);border:1px solid var(--border);color:var(--ink);padding:0.85rem 1rem;font-family:'Jost',sans-serif;font-size:0.9rem;border-radius:2px;outline:none;text-align:center;letter-spacing:0.15em;margin-bottom:0.8rem;transition:border-color 0.2s;}
+  .login-box input:focus{border-color:var(--spice);background:white;}
+  .login-btn{width:100%;background:var(--spice);color:white;border:none;padding:0.9rem;font-family:'Jost',sans-serif;font-size:0.74rem;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:background 0.2s;}
+  .login-btn:hover{background:#8f4420;}
+  .login-error{font-size:0.75rem;color:#c0392b;margin-top:0.5rem;display:none;}
+  .login-error.show{display:block;}
+
+  .admin-ui{display:none;}
+  .admin-ui.show{display:block;}
+
+  nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem 2.5rem;border-bottom:1px solid var(--border);background:var(--cream);position:sticky;top:0;z-index:10;}
+  .logo{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;letter-spacing:0.16em;}
+  .logo-line{font-size:0.52rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--stone);display:block;margin-top:1px;}
+  .nav-right{display:flex;gap:1.5rem;align-items:center;}
+  nav a{color:var(--stone);text-decoration:none;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:500;transition:color 0.2s;}
+  nav a:hover{color:var(--spice);}
+  .nav-badge{background:var(--spice);color:white;font-size:0.6rem;padding:0.2rem 0.6rem;border-radius:100px;letter-spacing:0.08em;}
+  .logout-btn{background:none;border:1px solid var(--border);color:var(--stone);padding:0.4rem 0.9rem;border-radius:2px;font-family:'Jost',sans-serif;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;}
+  .logout-btn:hover{border-color:var(--spice);color:var(--spice);}
+
+  .admin-layout{display:grid;grid-template-columns:1.1fr 0.9fr;min-height:calc(100vh - 60px);}
+
+  /* FORM */
+  .add-panel{background:var(--warm);border-right:1px solid var(--border);padding:2.5rem 3rem;overflow-y:auto;max-height:calc(100vh - 60px);}
+  .add-panel.editing{background:#FEF6EC;}
+  .edit-banner{background:var(--gold);color:white;font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;padding:0.5rem 1rem;border-radius:2px;margin-bottom:1.2rem;display:none;font-family:'Jost',sans-serif;}
+  .edit-banner.show{display:block;}
+  .panel-title{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:400;margin-bottom:0.3rem;}
+  .panel-sub{font-size:0.78rem;color:var(--stone);margin-bottom:2rem;line-height:1.6;}
+
+  .sdiv{font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--spice);margin:1.8rem 0 1.2rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0.6rem;}
+  .sdiv::before{content:'';width:16px;height:1px;background:var(--spice);}
+
+  .fg{margin-bottom:1.2rem;}
+  .fg label{display:block;font-size:0.6rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--stone);margin-bottom:0.4rem;font-weight:500;}
+  .fg input,.fg select,.fg textarea{width:100%;background:white;border:1px solid var(--border);color:var(--ink);padding:0.8rem 1rem;font-family:'Jost',sans-serif;font-size:0.88rem;font-weight:300;border-radius:2px;outline:none;transition:border-color 0.2s;appearance:none;}
+  .fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--spice);}
+  .fg select option{background:white;}
+  .fg textarea{resize:vertical;line-height:1.7;}
+  .fg-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+  .fg-three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;}
+  .fg-hint{font-size:0.65rem;color:var(--stone);margin-top:0.3rem;line-height:1.5;}
+
+  /* Toggle pills — for access, status, featured */
+  .toggle-group{display:flex;gap:0.5rem;flex-wrap:wrap;}
+  .toggle-pill{position:relative;}
+  .toggle-pill input[type=radio],.toggle-pill input[type=checkbox]{position:absolute;opacity:0;width:0;height:0;}
+  .toggle-pill label{display:block;padding:0.45rem 1rem;border:1px solid var(--border);border-radius:100px;font-size:0.7rem;font-family:'Jost',sans-serif;font-weight:500;letter-spacing:0.06em;cursor:pointer;transition:all 0.2s;background:white;color:var(--stone);white-space:nowrap;}
+  .toggle-pill input:checked + label{background:var(--ink);border-color:var(--ink);color:white;}
+  .toggle-pill.premium input:checked + label{background:var(--gold);border-color:var(--gold);color:white;}
+  .toggle-pill.draft input:checked + label{background:var(--stone);border-color:var(--stone);color:white;}
+  .toggle-pill.featured input:checked + label{background:var(--forest);border-color:var(--forest);color:white;}
+  .toggle-pill label:hover{border-color:var(--spice);}
+
+  /* Tags */
+  .tags-input-wrap{background:white;border:1px solid var(--border);border-radius:2px;padding:0.5rem 0.7rem;display:flex;flex-wrap:wrap;gap:0.4rem;cursor:text;transition:border-color 0.2s;}
+  .tags-input-wrap:focus-within{border-color:var(--spice);}
+  .tag-chip{background:var(--warm);border:1px solid var(--border);border-radius:100px;padding:0.2rem 0.6rem;font-size:0.7rem;display:flex;align-items:center;gap:0.3rem;color:var(--ink);}
+  .tag-chip button{background:none;border:none;color:var(--stone);cursor:pointer;font-size:0.75rem;line-height:1;padding:0;}
+  .tag-chip button:hover{color:#c0392b;}
+  .tags-input{border:none;outline:none;font-family:'Jost',sans-serif;font-size:0.82rem;font-weight:300;min-width:120px;flex:1;padding:0.15rem 0.2rem;background:transparent;}
+  .tag-suggestions{display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.5rem;}
+  .tag-sugg{background:none;border:1px dashed var(--border);color:var(--stone);padding:0.2rem 0.7rem;border-radius:100px;font-size:0.65rem;font-family:'Jost',sans-serif;cursor:pointer;transition:all 0.2s;}
+  .tag-sugg:hover{border-color:var(--spice);color:var(--spice);}
+
+  /* Ingredients */
+  .ing-header{display:grid;grid-template-columns:80px 1fr 24px;gap:0.5rem;margin-bottom:0.4rem;}
+  .ing-header span{font-size:0.55rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--stone);}
+  .ing-list{display:flex;flex-direction:column;gap:0.5rem;margin-bottom:0.8rem;}
+  .ing-row{display:grid;grid-template-columns:80px 1fr 24px;gap:0.5rem;align-items:center;}
+  .ing-row input{background:white;border:1px solid var(--border);color:var(--ink);padding:0.55rem 0.7rem;font-family:'Jost',sans-serif;font-size:0.82rem;font-weight:300;border-radius:2px;outline:none;width:100%;}
+  .ing-row input:focus{border-color:var(--spice);}
+  .ing-row input.qty{text-align:center;}
+
+  /* Steps */
+  .step-list{display:flex;flex-direction:column;gap:0.6rem;margin-bottom:0.8rem;}
+  .step-row{display:grid;grid-template-columns:22px 1fr 24px;gap:0.6rem;align-items:flex-start;}
+  .step-num{font-family:'Playfair Display',serif;font-size:0.9rem;color:var(--spice);padding-top:0.55rem;text-align:center;}
+  .step-row textarea{background:white;border:1px solid var(--border);color:var(--ink);padding:0.6rem 0.8rem;font-family:'Jost',sans-serif;font-size:0.82rem;font-weight:300;border-radius:2px;outline:none;resize:vertical;height:68px;line-height:1.6;width:100%;}
+  .step-row textarea:focus{border-color:var(--spice);}
+
+  .rm{background:none;border:none;color:rgba(28,22,16,0.18);cursor:pointer;font-size:1.1rem;line-height:1;padding:0;transition:color 0.2s;}
+  .rm:hover{color:#c0392b;}
+  .add-row{background:none;border:1px dashed var(--border);color:var(--stone);padding:0.5rem 1rem;border-radius:2px;font-family:'Jost',sans-serif;font-size:0.72rem;letter-spacing:0.08em;cursor:pointer;transition:all 0.2s;width:100%;margin-bottom:0.5rem;}
+  .add-row:hover{border-color:var(--spice);color:var(--spice);}
+  .emoji-preview{font-size:2.2rem;display:inline-block;margin-left:0.8rem;vertical-align:middle;}
+
+  .btn-row{display:flex;gap:0.8rem;margin-top:0.8rem;}
+  .save-btn{flex:1;background:var(--spice);color:white;border:none;padding:1rem;font-family:'Jost',sans-serif;font-size:0.78rem;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:background 0.25s;}
+  .save-btn:hover{background:#8f4420;}
+  .cancel-btn{background:none;border:1px solid var(--border);color:var(--stone);padding:1rem 1.4rem;font-family:'Jost',sans-serif;font-size:0.72rem;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:all 0.2s;display:none;}
+  .cancel-btn:hover{border-color:var(--spice);color:var(--spice);}
+  .cancel-btn.show{display:block;}
+  .save-ok{padding:0.9rem;text-align:center;font-size:0.8rem;border-radius:2px;display:none;margin-top:0.8rem;line-height:1.6;}
+  .save-ok.show{display:block;}
+  .save-ok.saved{background:#eaf2eb;border:1px solid rgba(53,77,60,0.2);color:var(--forest);}
+  .save-ok.drafted{background:#f5f0e8;border:1px solid rgba(196,145,58,0.3);color:#7a5c1e;}
+
+  /* LIST PANEL */
+  .list-panel{background:var(--cream);padding:2.5rem;overflow-y:auto;max-height:calc(100vh - 60px);}
+  .list-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:1rem;}
+  .list-title{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:400;}
+  .list-count{font-size:0.72rem;color:var(--stone);}
+
+  /* List filter tabs */
+  .list-tabs{display:flex;gap:0.4rem;margin-bottom:1.2rem;}
+  .list-tab{background:none;border:1px solid var(--border);color:var(--stone);padding:0.3rem 0.8rem;border-radius:100px;font-size:0.65rem;font-family:'Jost',sans-serif;cursor:pointer;transition:all 0.2s;letter-spacing:0.04em;}
+  .list-tab.active,.list-tab:hover{background:var(--ink);border-color:var(--ink);color:white;}
+
+  .rr{display:flex;align-items:center;gap:1rem;padding:1rem 0;border-bottom:1px solid var(--border);}
+  .rr:last-child{border:none;}
+  .rr-thumb{width:44px;height:44px;border-radius:4px;background:var(--warm);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;position:relative;}
+  .rr-info{flex:1;min-width:0;}
+  .rr-name{font-family:'Playfair Display',serif;font-size:0.9rem;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .rr-meta{font-size:0.65rem;color:var(--stone);margin-top:0.2rem;display:flex;flex-wrap:wrap;gap:0.3rem;align-items:center;}
+  .badge{display:inline-block;font-size:0.52rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.12rem 0.45rem;border-radius:100px;font-weight:500;}
+  .badge-cat{background:var(--warm);border:1px solid var(--border);color:var(--stone);}
+  .badge-free{background:#e8f4ea;border:1px solid rgba(53,77,60,0.2);color:var(--forest);}
+  .badge-premium{background:#fdf3e3;border:1px solid rgba(196,145,58,0.3);color:#7a5c1e;}
+  .badge-draft{background:#f0ede8;border:1px solid var(--border);color:var(--stone);}
+  .badge-featured{background:#eef2ee;border:1px solid rgba(53,77,60,0.2);color:var(--forest);}
+
+  .rr-actions{display:flex;gap:0.4rem;flex-shrink:0;}
+  .rr-del,.rr-edit{background:none;border:1px solid var(--border);color:var(--stone);padding:0.3rem 0.7rem;border-radius:2px;font-size:0.6rem;font-family:'Jost',sans-serif;cursor:pointer;transition:all 0.2s;}
+  .rr-del:hover{border-color:#c0392b;color:#c0392b;}
+  .rr-edit:hover{border-color:var(--spice);color:var(--spice);}
+
+  .empty-list{text-align:center;padding:4rem 1rem;}
+  .el-icon{font-size:2.5rem;margin-bottom:0.8rem;}
+  .empty-list p{font-size:0.82rem;color:var(--stone);line-height:1.7;}
+
+  @media(max-width:900px){
+    .admin-layout{grid-template-columns:1fr;}
+    .add-panel,.list-panel{max-height:none;padding:2rem 1.5rem;}
+    nav{padding:1rem 1.5rem;}
+    .fg-row,.fg-three{grid-template-columns:1fr;}
+    .ing-row{grid-template-columns:80px 1fr 24px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">NARU</div>
+    <div class="login-sub">Admin Access</div>
+    <input type="password" id="pwInput" placeholder="Enter password" onkeydown="if(event.key==='Enter')tryLogin()">
+    <button class="login-btn" onclick="tryLogin()">Enter</button>
+    <div class="login-error" id="loginError">Incorrect password. Try again.</div>
+  </div>
+</div>
+
+<div class="admin-ui" id="adminUi">
+  <nav>
+    <div><span class="logo">NARU</span><span class="logo-line">Admin</span></div>
+    <div class="nav-right">
+      <a href="index.html">← Homepage</a>
+      <a href="recipes.html">View Recipes</a>
+      <span class="nav-badge" id="recipeCount">0 recipes</span>
+      <button class="logout-btn" onclick="logout()">Log out</button>
+    </div>
+  </nav>
+
+  <div class="admin-layout">
+
+    <!-- ── FORM ── -->
+    <div class="add-panel" id="addPanel">
+      <div class="edit-banner" id="editBanner">✏️ Editing recipe — make your changes and hit Save</div>
+      <div class="panel-title" id="formTitle">Add a Recipe</div>
+      <p class="panel-sub">Fill in everything below and hit Save — it appears on the site instantly.</p>
+      <input type="hidden" id="editIndex" value="-1">
+
+      <div class="sdiv">The Basics</div>
+
+      <div class="fg"><label>Recipe Title *</label><input type="text" id="f-title" placeholder="e.g. Homemade Crackers"></div>
+      <div class="fg"><label>Short Description</label><textarea id="f-desc" style="height:70px" placeholder="A sentence or two about the dish..."></textarea></div>
+
+      <div class="fg-row">
+        <div class="fg"><label>Category *</label>
+          <select id="f-cat">
+            <option>Bread & Baking</option><option>Fermentation</option><option>Mains</option>
+            <option>Breakfast</option><option>Condiments</option><option>Desserts</option>
+            <option>Snacks</option><option>Soups</option>
+          </select>
+        </div>
+        <div class="fg"><label>Emoji thumbnail</label>
+          <div style="display:flex;align-items:center">
+            <input type="text" id="f-emoji" placeholder="🍞" style="width:80px" oninput="document.getElementById('ep').textContent=this.value||'🍽️'">
+            <span class="emoji-preview" id="ep">🍽️</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="fg-three">
+        <div class="fg"><label>Cook Time *</label><input type="text" id="f-time" placeholder="25 min"></div>
+        <div class="fg"><label>Servings</label><input type="text" id="f-servings" placeholder="4 people"></div>
+        <div class="fg"><label>Difficulty</label>
+          <select id="f-diff"><option>Easy</option><option>Intermediate</option><option>Advanced</option></select>
+        </div>
+      </div>
+
+      <div class="sdiv">Publishing</div>
+
+      <!-- Access: Free / Premium -->
+      <div class="fg">
+        <label>Access</label>
+        <div class="toggle-group">
+          <div class="toggle-pill">
+            <input type="radio" name="access" id="access-free" value="free" checked>
+            <label for="access-free">🆓 Free</label>
+          </div>
+          <div class="toggle-pill premium">
+            <input type="radio" name="access" id="access-premium" value="premium">
+            <label for="access-premium">⭐ Premium</label>
+          </div>
+        </div>
+        <div class="fg-hint">Premium recipes will show a lock to non-subscribers. Payment will be set up later.</div>
+      </div>
+
+      <!-- Status: Published / Draft -->
+      <div class="fg">
+        <label>Status</label>
+        <div class="toggle-group">
+          <div class="toggle-pill">
+            <input type="radio" name="status" id="status-published" value="published" checked>
+            <label for="status-published">✓ Published</label>
+          </div>
+          <div class="toggle-pill draft">
+            <input type="radio" name="status" id="status-draft" value="draft">
+            <label for="status-draft">✎ Draft</label>
+          </div>
+        </div>
+        <div class="fg-hint">Drafts are saved but won't appear on the public recipes page.</div>
+      </div>
+
+      <!-- Featured toggle -->
+      <div class="fg">
+        <label>Featured</label>
+        <div class="toggle-group">
+          <div class="toggle-pill">
+            <input type="radio" name="featured" id="feat-no" value="no" checked>
+            <label for="feat-no">Standard</label>
+          </div>
+          <div class="toggle-pill featured">
+            <input type="radio" name="featured" id="feat-yes" value="yes">
+            <label for="feat-yes">⭑ Featured</label>
+          </div>
+        </div>
+        <div class="fg-hint">Featured recipes appear at the top of the recipes page.</div>
+      </div>
+
+      <!-- Tags -->
+      <div class="fg">
+        <label>Tags</label>
+        <div class="tags-input-wrap" id="tagsWrap" onclick="document.getElementById('tagInput').focus()">
+          <input type="text" id="tagInput" class="tags-input" placeholder="Type a tag and press Enter…" onkeydown="handleTagKey(event)">
+        </div>
+        <div class="tag-suggestions">
+          <button class="tag-sugg" onclick="addTag('Vegetarian')">Vegetarian</button>
+          <button class="tag-sugg" onclick="addTag('Vegan')">Vegan</button>
+          <button class="tag-sugg" onclick="addTag('Gluten-free')">Gluten-free</button>
+          <button class="tag-sugg" onclick="addTag('Dairy-free')">Dairy-free</button>
+          <button class="tag-sugg" onclick="addTag('Quick')">Quick</button>
+          <button class="tag-sugg" onclick="addTag('Make-ahead')">Make-ahead</button>
+          <button class="tag-sugg" onclick="addTag('Seasonal')">Seasonal</button>
+        </div>
+        <div class="fg-hint">Tags help visitors filter and discover recipes.</div>
+      </div>
+
+      <div class="sdiv">Ingredients</div>
+      <div class="ing-header"><span>Amount</span><span>Ingredient</span><span></span></div>
+      <div class="ing-list" id="ing-list"></div>
+      <button class="add-row" onclick="addIng()">+ Add ingredient</button>
+
+      <div class="sdiv">Method</div>
+      <div class="step-list" id="step-list"></div>
+      <button class="add-row" onclick="addStep()">+ Add step</button>
+
+      <div class="sdiv">Notes <span style="font-size:0.55rem;color:var(--stone);letter-spacing:0.1em">(optional)</span></div>
+      <div class="fg"><textarea id="f-notes" style="height:80px" placeholder="Tips, variations, things to watch out for..."></textarea></div>
+
+      <div class="btn-row">
+        <button class="cancel-btn" id="cancelBtn" onclick="cancelEdit()">Cancel</button>
+        <button class="save-btn" id="saveBtn" onclick="saveRecipe()">Save Recipe →</button>
+      </div>
+      <div class="save-ok" id="saveOk"></div>
+    </div>
+
+    <!-- ── LIST ── -->
+    <div class="list-panel">
+      <div class="list-header">
+        <div class="list-title">Your Recipes</div>
+        <div class="list-count" id="listCount"></div>
+      </div>
+      <div class="list-tabs">
+        <button class="list-tab active" onclick="setListTab('all',this)">All</button>
+        <button class="list-tab" onclick="setListTab('published',this)">Published</button>
+        <button class="list-tab" onclick="setListTab('draft',this)">Drafts</button>
+        <button class="list-tab" onclick="setListTab('premium',this)">Premium</button>
+        <button class="list-tab" onclick="setListTab('featured',this)">Featured</button>
+      </div>
+      <div id="recipeList"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const KEY = 'naru_recipes';
+  const PW = 'naru2026';
+
+  const SEED_RECIPES = [
+    {id:1001,title:"Turkish Eggs",description:"The brunch dish that turned a lazy Sunday into a full-blown ritual. Silky poached eggs nestled on garlicky Greek yoghurt, drowned in sizzling Aleppo pepper butter — it's outrageously good for something this simple.",category:"Breakfast",emoji:"🍳",cookTime:"30 mins",servings:"1 person",difficulty:"Intermediate",access:"free",status:"published",featured:false,tags:["Vegetarian","Gluten-Free"],ingredients:[{qty:"2",name:"eggs"},{qty:"2 slices",name:"sourdough"},{qty:"few sprigs",name:"dill"},{qty:"100g",name:"Greek yoghurt"},{qty:"1 clove",name:"garlic (medium)"},{qty:"1 tbsp",name:"butter"},{qty:"1 tbsp",name:"olive oil"},{qty:"1 tsp",name:"Aleppo pepper"},{qty:"1 tsp",name:"lemon juice"}],steps:["Slice bread first. Fill a pan with warm water, bring to boil then simmer. Add yoghurt, a pinch of salt & garlic to a bowl on top of pan. Whip until it reaches room temperature, then turn off heat.","Melt butter until it becomes brown, turn off heat, add olive oil and chilli flakes.","Crack eggs into a fine mesh strainer over a bowl and swirl for ~30 seconds to separate the watery part. Add eggs to a ramekin.","Boil water in a pan & turn down to a very low simmer. Add 1 tbsp lemon juice (or vinegar) and create a vortex. Add eggs for 3–4 mins. Remove eggs to a plate or kitchen towel. Toast bread alongside.","Assemble: add yoghurt, then eggs, then the peppery butter, then dill. Serve with buttered sourdough on the side."],notes:null,addedAt:"2025-01-01T00:00:00.000Z"},
+    {id:1002,title:"Selfish Alchemist",description:"A gin sour with a twist — fruity compot and frothy egg white make this one feel almost too pretty to drink. Almost.",category:"Cocktails",emoji:"🍸",cookTime:"10 mins",servings:"1 person",difficulty:"Easy",access:"free",status:"published",featured:false,tags:["Vegetarian","Vegan"],ingredients:[{qty:"2 shots",name:"gin"},{qty:"1 shot",name:"sugar syrup"},{qty:"1–2",name:"egg whites"},{qty:"1 tbsp",name:"compot"},{qty:"1 shot",name:"lemon juice"}],steps:["Add gin, lemon, sugar syrup & egg white to shaker.","Dry shake with no ice.","Wet shake with ice & 1 tablespoon compot.","Double strain."],notes:"Quite sweet — add more egg white if desired.",addedAt:"2025-01-01T00:00:01.000Z"},
+    {id:1003,title:"Tangerine Sour",description:"Bourbon gets a citrus glow-up. Fresh tangerines, lemon, and a velvet egg-white foam — this one tastes like a sunset in a coupe glass.",category:"Cocktails",emoji:"🍊",cookTime:"10 mins",servings:"1 person",difficulty:"Easy",access:"free",status:"published",featured:false,tags:["Vegetarian","Gluten-Free","Vegan"],ingredients:[{qty:"2",name:"tangerines"},{qty:"1 shot",name:"lemon juice"},{qty:"3 shots",name:"bourbon"},{qty:"1",name:"egg white"},{qty:"few dashes",name:"bitters (orange or normal)"},{qty:"to taste",name:"honey"}],steps:["Combine all ingredients.","Add coil & dry shake.","Add ice & shake.","Double strain."],notes:null,addedAt:"2025-01-01T00:00:02.000Z"},
+    {id:1004,title:"Breda Pear",description:"A showstopper dessert that's essentially a love letter to autumn — fragrant rosemary cake, poached pears, crunchy fennel-almond crumb, and a drizzle of pear liqueur. Best with tea.",category:"Desserts",emoji:"🍐",cookTime:"1 hr 45 mins",servings:"4 people",difficulty:"Advanced",access:"free",status:"published",featured:true,tags:["Vegetarian"],ingredients:[{qty:"94g",name:"butter"},{qty:"56g",name:"caster sugar"},{qty:"2",name:"medium eggs"},{qty:"131g",name:"self-raising flour"},{qty:"3 tbsp",name:"milk"},{qty:"1 sprig",name:"rosemary"},{qty:"1",name:"lemon peel"},{qty:"3 large",name:"pears"},{qty:"180g",name:"caster sugar (for poaching)"},{qty:"½",name:"cinnamon stick"},{qty:"½ tsp",name:"vanilla essence"},{qty:"¾ tsp",name:"fennel seeds"},{qty:"1 tbsp",name:"crushed almonds"}],steps:["Rosemary Cake: Grease cake tin. Set oven to 180°C. Cream sugar & butter together. Add eggs 1 at a time, then flour. Add milk & lemon zest. Add finely chopped rosemary. Add to tin and cook for 45 mins. Once baked, take a small amount out, put in oven to crisp up.","Poached Pears: Add all ingredients to pan apart from pears. Add peeled pears, turn on heat & let boil, then drop to simmer. Once cooked, turn heat off & allow to cool. Place in fridge until serving.","Crumb: Grind ½ tsp sugar, fennel seeds & ¼ tsp cinnamon until a coarse powder.","Assemble: Cake at bottom. Add pear juice. Pears on next (sliced into thin pieces). Cream or ice cream. Crumbs from crispy cake bits. Crumb of nuts & fennel seeds on top."],notes:"Goes great with tea.",addedAt:"2025-01-01T00:00:03.000Z"},
+    {id:1005,title:"Eggs Benedict",description:"The weekend project worth every minute — crispy bacon, perfectly poached eggs, and a glossy homemade hollandaise that you absolutely made from scratch. Goes great with fresh OJ.",category:"Breakfast",emoji:"🥚",cookTime:"45 mins",servings:"4 people",difficulty:"Intermediate",access:"free",status:"published",featured:false,tags:["Gluten-Free"],ingredients:[{qty:"8 rashers",name:"bacon"},{qty:"8",name:"eggs"},{qty:"½ loaf",name:"sourdough"},{qty:"3",name:"egg yolks (hollandaise)"},{qty:"1 tbsp",name:"lemon juice"},{qty:"1 tsp",name:"Dijon mustard"},{qty:"¼ tsp",name:"salt"},{qty:"pinch",name:"cayenne pepper"},{qty:"113g",name:"unsalted butter / ghee"},{qty:"12 spears",name:"asparagus"}],steps:["Put bacon in the oven for 10–20 mins, flipping halfway. Slice bread (4 slices) & toast while eggs poach.","Start poaching eggs: crack egg into sieve to remove thin egg parts. Poach in barely simmering water with 1 tbsp vinegar & a whirlpool. Aim for 2 at a time at 3 minutes. Once cooked, place on a kitchen towel.","Make hollandaise: melt butter in microwave (~45 seconds). Add lemon, mustard, salt & cayenne to egg yolks & whisk. Stream in the butter until emulsified — be careful it doesn't scramble.","Once eggs are poached, steam asparagus for a few minutes.","Assemble: bread with butter → bacon × 2 → eggs × 2 → hollandaise → asparagus on the side → sprinkle of flaky salt."],notes:"If hollandaise is too thick, add more butter. If too thin, heat over boiling water but keep an eye on it.",addedAt:"2025-01-01T00:00:04.000Z"},
+    {id:1006,title:"Picante",description:"Tequila, chilli, honey and coriander — it's a firestarter in the best possible way. Start with less chilli and work your way up, because there's no going back once it's in.",category:"Cocktails",emoji:"🌶️",cookTime:"5 mins",servings:"2 people",difficulty:"Easy",access:"free",status:"published",featured:false,tags:["Vegetarian"],ingredients:[{qty:"50ml",name:"tequila"},{qty:"25ml",name:"lime juice"},{qty:"1",name:"red chilli"},{qty:"2–3 sprigs",name:"coriander"},{qty:"25ml",name:"honey"}],steps:["Muddle chopped chilli in shaker.","Slap coriander & add to shaker.","Add tequila, lime & honey. Shake & pour.","Garnish with chilli, lime slice & coriander sprig."],notes:"Shake with less chilli & coriander first to test your spice levels.",addedAt:"2025-01-01T00:00:05.000Z"},
+    {id:1007,title:"Tiramisu",description:"The only tiramisu recipe you'll ever need — rich mascarpone cream, coffee-soaked ladyfingers, and a generous hand with the liqueur. Make it the night before and try not to eat half of it immediately.",category:"Desserts",emoji:"☕",cookTime:"30 mins + 4 hrs chilling",servings:"8 people",difficulty:"Intermediate",access:"free",status:"published",featured:false,tags:[],ingredients:[{qty:"6 large",name:"egg yolks"},{qty:"180g",name:"caster sugar"},{qty:"282g",name:"mascarpone"},{qty:"417g",name:"double cream"},{qty:"30",name:"ladyfingers"},{qty:"237g",name:"coffee"},{qty:"118g",name:"liqueur (coffee or triple sec)"},{qty:"80g",name:"cocoa"}],steps:["Whip eggs & sugar in a double boiler with simmering water for 10 mins — should get thick and yellow.","Remove from heat & let cool.","Add room temperature mascarpone and continue to blend using hand whisk. Increase speed.","Separately, whip fresh double cream slowly, increasing speed to stiff peaks.","Add cream slowly to mixture until fully combined.","Dip ladyfingers in cold/room-temp coffee with added liqueur.","Assemble tiramisu in layers.","Refrigerate a minimum of 4 hours."],notes:null,addedAt:"2025-01-01T00:00:06.000Z"},
+    {id:1008,title:"Maple Butter Loaf",description:"Dense, moist and unapologetically indulgent — this loaf cake is finished with a sticky maple butter glaze that soaks straight in. Rated 4 stars for a reason.",category:"Bread & Baking",emoji:"🍞",cookTime:"1 hr",servings:"8 people",difficulty:"Easy",access:"free",status:"published",featured:false,tags:["Vegetarian"],ingredients:[{qty:"120g",name:"unsalted butter"},{qty:"235g",name:"plain flour"},{qty:"160g",name:"caster sugar"},{qty:"2 tsp",name:"baking powder"},{qty:"¼ tsp",name:"sea salt"},{qty:"3 large",name:"eggs"},{qty:"3 tbsp",name:"neutral oil"},{qty:"40ml",name:"maple syrup"},{qty:"100g",name:"sour cream"},{qty:"80g",name:"maple syrup (glaze)"},{qty:"20g",name:"unsalted butter (glaze)"},{qty:"pinch",name:"flaky sea salt"}],steps:["Preheat oven to 180°C. Combine all dry ingredients. Whisk butter, eggs, oil, maple syrup & sour cream together. Mix wet into dry until just combined. Pour into greased loaf tin.","Bake for 45 mins until a skewer comes out clean.","Make glaze by melting butter & maple syrup together. Pour over warm loaf & finish with flaky salt."],notes:"If using self-raising flour, use ¼ tsp baking powder instead of 2 tsp.",addedAt:"2025-01-01T00:00:07.000Z"},
+    {id:1009,title:"Brown Sugar Custard",description:"Lush, velvety and barely sweet — this stovetop custard made with light muscovado sugar has a depth of flavour that shop-bought can only dream of. Non-dairy milk works beautifully too.",category:"Desserts",emoji:"🍮",cookTime:"20 mins",servings:"6 people",difficulty:"Easy",access:"free",status:"published",featured:false,tags:["Vegetarian"],ingredients:[{qty:"800ml",name:"milk"},{qty:"200ml",name:"double cream"},{qty:"1 tsp",name:"vanilla paste"},{qty:"3 large",name:"egg yolks"},{qty:"90g",name:"light muscovado sugar"},{qty:"2 tbsp",name:"cornflour"}],steps:["Add milk, cream & vanilla to a saucepan and heat until hot, just before boiling.","Add egg yolk, sugar & cornflour to a separate bowl and whisk until smooth.","Add a small amount of hot milk to eggs, whisking constantly. Add rest of milk in 3 goes.","Add back to pan and cook on a low heat for 5–7 mins until it reaches the right thickness, stirring constantly."],notes:"Non-dairy milk works well as a substitute.",addedAt:"2025-01-01T00:00:08.000Z"}
+  ];
+
+  function seedRecipes(){
+    const existing = JSON.parse(localStorage.getItem(KEY) || '[]');
+    const alreadySeeded = existing.some(r => r.id >= 1001 && r.id <= 1009);
+    if(!alreadySeeded){
+      const merged = [...SEED_RECIPES, ...existing.filter(r => !SEED_RECIPES.find(s => s.id === r.id))];
+      localStorage.setItem(KEY, JSON.stringify(merged));
+    }
+  }
+  let currentTags = [];
+  let listTab = 'all';
+
+  function getRecipes(){ try{return JSON.parse(localStorage.getItem(KEY))||[];}catch(e){return[];} }
+  function setRecipes(r){ localStorage.setItem(KEY,JSON.stringify(r)); }
+
+  // AUTH
+  function tryLogin(){
+    if(document.getElementById('pwInput').value===PW){
+      document.getElementById('loginScreen').classList.add('hide');
+      document.getElementById('adminUi').classList.add('show');
+      sessionStorage.setItem('naru_auth','1');
+      init();
+    } else {
+      document.getElementById('loginError').classList.add('show');
+      document.getElementById('pwInput').value='';
+    }
+  }
+  function logout(){ sessionStorage.removeItem('naru_auth'); location.reload(); }
+
+  // TAGS
+  function handleTagKey(e){
+    if(e.key==='Enter'||e.key===','){
+      e.preventDefault();
+      const val=e.target.value.trim().replace(/,$/,'');
+      if(val) addTag(val);
+      e.target.value='';
+    } else if(e.key==='Backspace'&&!e.target.value&&currentTags.length){
+      removeTag(currentTags[currentTags.length-1]);
+    }
+  }
+  function addTag(tag){
+    tag=tag.trim();
+    if(!tag||currentTags.includes(tag)) return;
+    currentTags.push(tag);
+    renderTags();
+    document.getElementById('tagInput').value='';
+  }
+  function removeTag(tag){
+    currentTags=currentTags.filter(t=>t!==tag);
+    renderTags();
+  }
+  function renderTags(){
+    const wrap=document.getElementById('tagsWrap');
+    const input=document.getElementById('tagInput');
+    wrap.innerHTML='';
+    currentTags.forEach(tag=>{
+      const chip=document.createElement('div'); chip.className='tag-chip';
+      chip.innerHTML=`${tag}<button onclick="removeTag('${tag}')" title="Remove">×</button>`;
+      wrap.appendChild(chip);
+    });
+    wrap.appendChild(input);
+  }
+
+  // INGREDIENTS
+  function addIng(qty='',name=''){
+    const row=document.createElement('div'); row.className='ing-row';
+    row.innerHTML=`<input type="text" class="qty" placeholder="200g" value="${qty}"><input type="text" placeholder="plain flour" value="${name}"><button class="rm" onclick="this.parentElement.remove()">×</button>`;
+    document.getElementById('ing-list').appendChild(row);
+  }
+
+  // STEPS
+  function addStep(text=''){
+    const list=document.getElementById('step-list');
+    const n=list.children.length+1;
+    const row=document.createElement('div'); row.className='step-row';
+    row.innerHTML=`<div class="step-num">${n}</div><textarea placeholder="Describe this step...">${text}</textarea><button class="rm" onclick="removeStep(this)">×</button>`;
+    list.appendChild(row);
+  }
+  function removeStep(btn){ btn.parentElement.remove(); document.querySelectorAll('.step-num').forEach((el,i)=>el.textContent=i+1); }
+
+  // COLLECT FORM
+  function collectRecipe(){
+    const title=document.getElementById('f-title').value.trim();
+    const cookTime=document.getElementById('f-time').value.trim();
+    if(!title||!cookTime){alert('Please fill in at least a title and cook time.');return null;}
+
+    const ingredients=[];
+    document.querySelectorAll('.ing-row').forEach(r=>{
+      const inputs=r.querySelectorAll('input');
+      const name=inputs[1].value.trim();
+      if(name) ingredients.push({qty:inputs[0].value.trim(),name});
+    });
+    const steps=[];
+    document.querySelectorAll('.step-row textarea').forEach(t=>{ if(t.value.trim()) steps.push(t.value.trim()); });
+
+    return {
+      title, cookTime,
+      description: document.getElementById('f-desc').value.trim(),
+      category:    document.getElementById('f-cat').value,
+      emoji:       document.getElementById('f-emoji').value.trim()||'🍽️',
+      servings:    document.getElementById('f-servings').value.trim(),
+      difficulty:  document.getElementById('f-diff').value,
+      access:      document.querySelector('input[name=access]:checked').value,
+      status:      document.querySelector('input[name=status]:checked').value,
+      featured:    document.querySelector('input[name=featured]:checked').value === 'yes',
+      tags:        [...currentTags],
+      ingredients, steps,
+      notes: document.getElementById('f-notes').value.trim()
+    };
+  }
+
+  // SAVE
+  function saveRecipe(){
+    const data=collectRecipe(); if(!data) return;
+    const recipes=getRecipes();
+    const idx=parseInt(document.getElementById('editIndex').value);
+
+    if(idx>=0){
+      data.id=recipes[idx].id;
+      data.addedAt=recipes[idx].addedAt;
+      data.updatedAt=new Date().toISOString();
+      recipes[idx]=data;
+    } else {
+      data.id=Date.now();
+      data.addedAt=new Date().toISOString();
+      recipes.unshift(data);
+    }
+
+    setRecipes(recipes);
+    const isDraft=data.status==='draft';
+    showOk(
+      isDraft ? '✎ Saved as draft — not yet visible on the recipes page.' : '✓ Recipe saved! It\'s now live on the recipes page.',
+      isDraft ? 'drafted' : 'saved'
+    );
+    resetForm();
+    renderList();
+  }
+
+  // EDIT
+  function editRecipe(i){
+    const r=getRecipes()[i];
+    document.getElementById('addPanel').scrollTo(0,0);
+    document.getElementById('editIndex').value=i;
+    document.getElementById('formTitle').textContent='Edit Recipe';
+    document.getElementById('editBanner').classList.add('show');
+    document.getElementById('addPanel').classList.add('editing');
+    document.getElementById('cancelBtn').classList.add('show');
+    document.getElementById('saveBtn').textContent='Save Changes →';
+
+    document.getElementById('f-title').value=r.title||'';
+    document.getElementById('f-desc').value=r.description||'';
+    document.getElementById('f-emoji').value=r.emoji||'';
+    document.getElementById('ep').textContent=r.emoji||'🍽️';
+    document.getElementById('f-time').value=r.cookTime||'';
+    document.getElementById('f-servings').value=r.servings||'';
+    document.getElementById('f-notes').value=r.notes||'';
+
+    setSelectVal('f-cat', r.category);
+    setSelectVal('f-diff', r.difficulty);
+    setRadio('access', r.access||'free');
+    setRadio('status', r.status||'published');
+    setRadio('featured', r.featured?'yes':'no');
+
+    currentTags=r.tags?[...r.tags]:[];
+    renderTags();
+
+    document.getElementById('ing-list').innerHTML='';
+    if(r.ingredients&&r.ingredients.length){ r.ingredients.forEach(ing=>addIng(ing.qty,ing.name)); }
+    else { addIng();addIng();addIng(); }
+
+    document.getElementById('step-list').innerHTML='';
+    if(r.steps&&r.steps.length){ r.steps.forEach(s=>addStep(s)); }
+    else { addStep();addStep(); }
+  }
+
+  function setSelectVal(id,val){ const s=document.getElementById(id); for(let i=0;i<s.options.length;i++){if(s.options[i].value===val){s.selectedIndex=i;break;}} }
+  function setRadio(name,val){ const el=document.querySelector(`input[name=${name}][value="${val}"]`); if(el) el.checked=true; }
+
+  function cancelEdit(){ resetForm(); }
+  function resetForm(){
+    document.getElementById('editIndex').value='-1';
+    document.getElementById('formTitle').textContent='Add a Recipe';
+    document.getElementById('editBanner').classList.remove('show');
+    document.getElementById('addPanel').classList.remove('editing');
+    document.getElementById('cancelBtn').classList.remove('show');
+    document.getElementById('saveBtn').textContent='Save Recipe →';
+    ['f-title','f-desc','f-emoji','f-time','f-servings','f-notes'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('ep').textContent='🍽️';
+    document.getElementById('f-cat').selectedIndex=0;
+    document.getElementById('f-diff').selectedIndex=0;
+    setRadio('access','free');
+    setRadio('status','published');
+    setRadio('featured','no');
+    currentTags=[]; renderTags();
+    document.getElementById('ing-list').innerHTML='';
+    document.getElementById('step-list').innerHTML='';
+    addIng();addIng();addIng();addStep();addStep();
+  }
+
+  function showOk(msg,type){
+    const ok=document.getElementById('saveOk');
+    ok.textContent=msg; ok.className='save-ok show '+type;
+    setTimeout(()=>ok.classList.remove('show'),4000);
+  }
+
+  // LIST
+  function setListTab(tab,btn){
+    listTab=tab;
+    document.querySelectorAll('.list-tab').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    renderList();
+  }
+
+  function renderList(){
+    let recipes=getRecipes();
+    const total=recipes.length;
+    document.getElementById('recipeCount').textContent=total+' recipe'+(total!==1?'s':'');
+
+    if(listTab==='published') recipes=recipes.filter(r=>r.status!=='draft');
+    else if(listTab==='draft') recipes=recipes.filter(r=>r.status==='draft');
+    else if(listTab==='premium') recipes=recipes.filter(r=>r.access==='premium');
+    else if(listTab==='featured') recipes=recipes.filter(r=>r.featured);
+
+    document.getElementById('listCount').textContent=recipes.length+' shown';
+    const el=document.getElementById('recipeList');
+    if(!recipes.length){
+      el.innerHTML='<div class="empty-list"><div class="el-icon">🍳</div><p>Nothing here yet.</p></div>';
+      return;
+    }
+
+    // featured first within filtered set
+    recipes=[...recipes].sort((a,b)=>(b.featured?1:0)-(a.featured?1:0));
+    const allRecipes=getRecipes();
+
+    el.innerHTML=recipes.map(r=>{
+      const i=allRecipes.indexOf(r);
+      const badges=[
+        `<span class="badge badge-cat">${r.category||''}</span>`,
+        r.access==='premium'?`<span class="badge badge-premium">⭐ Premium</span>`:`<span class="badge badge-free">Free</span>`,
+        r.status==='draft'?`<span class="badge badge-draft">Draft</span>`:'',
+        r.featured?`<span class="badge badge-featured">⭑ Featured</span>`:'',
+      ].filter(Boolean).join('');
+      return `<div class="rr">
+        <div class="rr-thumb">${r.emoji||'🍽️'}</div>
+        <div class="rr-info">
+          <div class="rr-name">${r.title}</div>
+          <div class="rr-meta">${badges} · ⏱ ${r.cookTime}</div>
+        </div>
+        <div class="rr-actions">
+          <button class="rr-edit" onclick="editRecipe(${i})">Edit</button>
+          <button class="rr-del" onclick="delRecipe(${i})">Remove</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function delRecipe(i){
+    if(!confirm('Remove "'+getRecipes()[i].title+'"?'))return;
+    const r=getRecipes(); r.splice(i,1); setRecipes(r); renderList();
+  }
+
+  function init(){ seedRecipes(); renderList(); addIng();addIng();addIng();addStep();addStep(); }
+
+  if(sessionStorage.getItem('naru_auth')==='1'){
+    document.getElementById('loginScreen').classList.add('hide');
+    document.getElementById('adminUi').classList.add('show');
+    init();
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NARU — Food Made With Care</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Jost:wght@300;400;500&family=Cormorant+Garamond:ital,wght@1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{--cream:#FDFAF4;--warm:#F4EDE0;--spice:#B85C2C;--forest:#354D3C;--ink:#1C1610;--stone:#7C7060;--gold:#C4913A;--border:rgba(28,22,16,0.1);}
+  *{margin:0;padding:0;box-sizing:border-box;}html,body{height:100%;}
+  body{background:var(--cream);color:var(--ink);font-family:'Jost',sans-serif;font-weight:300;overflow:hidden;}
+  .page{height:100vh;display:grid;grid-template-rows:auto 1fr auto;}
+  nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem 2.5rem;border-bottom:1px solid var(--border);background:var(--cream);}
+  .logo{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;letter-spacing:0.16em;}
+  .logo-line{font-size:0.52rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--stone);display:block;margin-top:1px;}
+  .nav-right{display:flex;gap:1.8rem;align-items:center;}
+  nav a{color:var(--stone);text-decoration:none;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:500;transition:color 0.2s;}
+  nav a:hover{color:var(--spice);}
+  .btn-fill{background:var(--spice);color:white;padding:0.75rem 1.6rem;border:none;border-radius:2px;font-family:'Jost',sans-serif;font-size:0.72rem;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;transition:background 0.2s;}
+  .btn-fill:hover{background:#8f4420;}
+  .btn-ghost{background:transparent;color:var(--ink);padding:0.75rem 1.6rem;border:1px solid var(--border);border-radius:2px;font-family:'Jost',sans-serif;font-size:0.72rem;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;text-decoration:none;display:inline-block;}
+  .btn-ghost:hover{border-color:var(--spice);color:var(--spice);}
+  .main{display:grid;grid-template-columns:1fr 1.6fr;overflow:hidden;}
+  .hero{background:var(--warm);padding:2.8rem 3rem;display:flex;flex-direction:column;justify-content:space-between;border-right:1px solid var(--border);position:relative;overflow:hidden;}
+  .hero::after{content:'';position:absolute;bottom:-80px;right:-80px;width:260px;height:260px;border-radius:50%;border:45px solid rgba(196,145,58,0.07);pointer-events:none;}
+  .hero-top{position:relative;z-index:1;}
+  .hero-kicker{font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--spice);margin-bottom:1.2rem;display:flex;align-items:center;gap:0.7rem;}
+  .hero-kicker::before{content:'';width:20px;height:1px;background:var(--spice);}
+  h1{font-family:'Playfair Display',serif;font-size:clamp(2.2rem,3.2vw,3.4rem);font-weight:400;line-height:1.12;letter-spacing:-0.01em;margin-bottom:1.2rem;animation:fadeUp 0.7s ease both;}
+  h1 em{font-style:italic;color:var(--spice);}
+  .hero-desc{font-size:0.88rem;line-height:1.78;color:var(--stone);max-width:320px;margin-bottom:2rem;animation:fadeUp 0.7s ease 0.1s both;}
+  .hero-actions{display:flex;gap:0.8rem;flex-wrap:wrap;animation:fadeUp 0.7s ease 0.2s both;}
+  .hero-bottom{position:relative;z-index:1;padding-top:1.5rem;border-top:1px solid var(--border);}
+  .hero-quote{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1rem;color:var(--stone);line-height:1.6;}
+  .hero-quote-attr{font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(28,22,16,0.3);margin-top:0.4rem;}
+  .pillars{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;}
+  .pillar{position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;padding:2rem 2.2rem;cursor:pointer;transition:all 0.3s;border-right:1px solid var(--border);border-bottom:1px solid var(--border);text-decoration:none;color:inherit;}
+  .pillar:nth-child(2){border-right:none;}.pillar:nth-child(3){border-bottom:none;}.pillar:nth-child(4){border-right:none;border-bottom:none;}
+  .pillar-recipes{background:#F7F0E3;}.pillar-recipes:hover{background:#EFE4CA;}
+  .pillar-watch{background:var(--forest);}.pillar-watch:hover{background:#2A3D2E;}
+  .pillar-shop{background:#F2E8D8;}.pillar-shop:hover{background:#E8D8BE;}
+  .pillar-book{background:var(--ink);}.pillar-book:hover{background:#0E0A06;}
+  .pillar-bg-text{position:absolute;top:-0.5rem;right:0.5rem;font-family:'Playfair Display',serif;font-weight:700;font-size:9rem;line-height:1;user-select:none;pointer-events:none;transition:transform 0.4s ease;}
+  .pillar:hover .pillar-bg-text{transform:scale(1.08) translateY(-4px);}
+  .pillar-recipes .pillar-bg-text,.pillar-shop .pillar-bg-text{color:rgba(28,22,16,0.05);}
+  .pillar-watch .pillar-bg-text,.pillar-book .pillar-bg-text{color:rgba(255,255,255,0.05);}
+  .pillar-icon{position:absolute;top:1.8rem;left:2.2rem;font-size:1.8rem;transition:transform 0.3s;}
+  .pillar:hover .pillar-icon{transform:scale(1.15) rotate(-5deg);}
+  .pillar-content{position:relative;z-index:1;}
+  .pillar-label{font-size:0.58rem;letter-spacing:0.3em;text-transform:uppercase;margin-bottom:0.4rem;font-weight:500;}
+  .pillar-recipes .pillar-label,.pillar-shop .pillar-label{color:var(--spice);}
+  .pillar-watch .pillar-label,.pillar-book .pillar-label{color:rgba(255,255,255,0.4);}
+  .pillar-title{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:400;line-height:1.2;margin-bottom:0.5rem;}
+  .pillar-recipes .pillar-title,.pillar-shop .pillar-title{color:var(--ink);}
+  .pillar-watch .pillar-title,.pillar-book .pillar-title{color:white;}
+  .pillar-desc{font-size:0.76rem;line-height:1.6;}
+  .pillar-recipes .pillar-desc,.pillar-shop .pillar-desc{color:var(--stone);}
+  .pillar-watch .pillar-desc,.pillar-book .pillar-desc{color:rgba(255,255,255,0.45);}
+  .pillar-arrow{display:inline-flex;align-items:center;gap:0.4rem;margin-top:0.9rem;font-size:0.68rem;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;transition:gap 0.2s;}
+  .pillar:hover .pillar-arrow{gap:0.7rem;}
+  .pillar-recipes .pillar-arrow,.pillar-shop .pillar-arrow{color:var(--spice);}
+  .pillar-watch .pillar-arrow{color:var(--gold);}
+  .pillar-book .pillar-arrow{color:rgba(255,255,255,0.5);}
+  .footer-strip{display:flex;justify-content:space-between;align-items:center;padding:0.85rem 2.5rem;border-top:1px solid var(--border);background:var(--cream);}
+  .fs-links{display:flex;gap:2rem;}
+  .fs-links a{color:rgba(28,22,16,0.3);text-decoration:none;font-size:0.66rem;letter-spacing:0.1em;text-transform:uppercase;transition:color 0.2s;}
+  .fs-links a:hover{color:var(--spice);}
+  .fs-copy{font-size:0.62rem;color:rgba(28,22,16,0.22);letter-spacing:0.06em;}
+  .overlay{position:fixed;inset:0;background:rgba(28,22,16,0.55);backdrop-filter:blur(10px);z-index:200;display:none;align-items:center;justify-content:center;}
+  .overlay.show{display:flex;}
+  .modal{background:var(--cream);border:1px solid var(--border);border-radius:4px;padding:2.5rem;max-width:420px;width:92%;box-shadow:0 24px 60px rgba(28,22,16,0.2);animation:popIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both;position:relative;max-height:90vh;overflow-y:auto;}
+  @keyframes popIn{from{opacity:0;transform:scale(0.95) translateY(10px)}to{opacity:1;transform:none}}
+  .modal-x{position:absolute;top:1rem;right:1rem;background:var(--warm);border:1px solid var(--border);width:26px;height:26px;border-radius:50%;cursor:pointer;color:var(--stone);display:flex;align-items:center;justify-content:center;font-size:0.65rem;transition:all 0.2s;}
+  .modal-x:hover{background:#f2ddd4;color:var(--spice);}
+  .modal-ey{font-size:0.58rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--spice);margin-bottom:0.4rem;}
+  .modal h3{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:400;margin-bottom:0.3rem;}
+  .modal-sub{color:var(--stone);font-size:0.8rem;margin-bottom:1.5rem;line-height:1.6;}
+  .fg{margin-bottom:1rem;}
+  .fg label{display:block;font-size:0.58rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--stone);margin-bottom:0.35rem;font-weight:500;}
+  .fg input,.fg select,.fg textarea{width:100%;background:var(--warm);border:1px solid var(--border);color:var(--ink);padding:0.75rem 0.9rem;font-family:'Jost',sans-serif;font-size:0.84rem;font-weight:300;border-radius:2px;outline:none;transition:border-color 0.2s;appearance:none;}
+  .fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--spice);background:white;}
+  .fg select option{background:white;}
+  .fg textarea{height:80px;resize:vertical;}
+  .fg-row{display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;}
+  .modal-submit{width:100%;background:var(--spice);color:white;border:none;padding:0.9rem;font-family:'Jost',sans-serif;font-size:0.74rem;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:background 0.2s;margin-top:0.3rem;}
+  .modal-submit:hover{background:#8f4420;}
+  .modal-ok{background:#eaf2eb;border:1px solid rgba(53,77,60,0.2);color:var(--forest);padding:0.9rem;text-align:center;font-size:0.78rem;border-radius:2px;display:none;margin-top:0.8rem;line-height:1.6;}
+  .modal-ok.show{display:block;}
+  .panel{position:fixed;inset:0;z-index:150;display:none;align-items:stretch;}
+  .panel.show{display:flex;}
+  .panel-backdrop{flex:1;background:rgba(28,22,16,0.4);backdrop-filter:blur(6px);cursor:pointer;}
+  .panel-drawer{width:min(520px,92vw);background:var(--cream);border-left:1px solid var(--border);overflow-y:auto;animation:slideIn 0.35s cubic-bezier(0.22,1,0.36,1) both;display:flex;flex-direction:column;}
+  @keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+  .drawer-head{padding:1.8rem 2rem 1.2rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;position:sticky;top:0;background:var(--cream);z-index:1;}
+  .drawer-title{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:400;}
+  .drawer-sub{font-size:0.75rem;color:var(--stone);margin-top:0.2rem;}
+  .drawer-x{background:var(--warm);border:1px solid var(--border);width:28px;height:28px;border-radius:50%;cursor:pointer;color:var(--stone);display:flex;align-items:center;justify-content:center;font-size:0.65rem;flex-shrink:0;margin-left:1rem;transition:all 0.2s;}
+  .drawer-x:hover{color:var(--spice);}
+  .drawer-body{padding:1.5rem 2rem;flex:1;}
+  .recipe-item{display:flex;gap:1.2rem;padding:1.2rem 0;border-bottom:1px solid var(--border);cursor:pointer;transition:padding 0.2s;text-decoration:none;color:inherit;}
+  .recipe-item:last-child{border:none;}
+  .recipe-item:hover{padding-left:0.5rem;}
+  .ri-thumb{width:56px;height:56px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0;background:var(--warm);}
+  .ri-cat{font-size:0.58rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--spice);margin-bottom:0.2rem;}
+  .ri-name{font-family:'Playfair Display',serif;font-size:0.95rem;font-weight:500;margin-bottom:0.2rem;}
+  .ri-meta{font-size:0.68rem;color:var(--stone);}
+  .empty-state{text-align:center;padding:3rem 1rem;}
+  .empty-state p{font-size:0.85rem;color:var(--stone);line-height:1.7;}
+  .vid-item{display:flex;gap:1.2rem;padding:1.2rem 0;border-bottom:1px solid var(--border);cursor:pointer;}
+  .vid-item:last-child{border:none;}
+  .vi-thumb{width:80px;height:52px;border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.4rem;position:relative;overflow:hidden;}
+  .vi-thumb::after{content:'▶';position:absolute;font-size:0.7rem;color:white;background:rgba(0,0,0,0.4);width:100%;height:100%;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.2s;}
+  .vid-item:hover .vi-thumb::after{opacity:1;}
+  .vi-cat{font-size:0.58rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:0.2rem;}
+  .vi-name{font-family:'Playfair Display',serif;font-size:0.9rem;font-weight:400;margin-bottom:0.2rem;}
+  .vi-meta{font-size:0.66rem;color:var(--stone);}
+  .shop-item{display:flex;gap:1.2rem;padding:1.2rem 0;border-bottom:1px solid var(--border);align-items:center;}
+  .shop-item:last-child{border:none;}
+  .si-thumb{width:56px;height:56px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0;}
+  .si-name{font-family:'Playfair Display',serif;font-size:0.95rem;font-weight:500;margin-bottom:0.2rem;}
+  .si-desc{font-size:0.72rem;color:var(--stone);line-height:1.5;}
+  .si-right{margin-left:auto;text-align:right;flex-shrink:0;}
+  .si-price{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--spice);}
+  .si-btn{display:block;margin-top:0.4rem;background:var(--spice);color:white;border:none;padding:0.35rem 0.8rem;border-radius:2px;font-size:0.6rem;font-family:'Jost',sans-serif;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:background 0.2s;}
+  .si-btn:hover{background:#8f4420;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+  @media(max-width:768px){body{overflow:auto;}.page{height:auto;}.main{grid-template-columns:1fr;}.hero{padding:2rem 1.5rem;}.pillars{grid-template-columns:1fr 1fr;}.pillar{min-height:180px;}nav{padding:1rem 1.5rem;}.fs-links{display:none;}.fg-row{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="page">
+  <nav>
+    <div>
+      <span class="logo">NARU</span>
+      <span class="logo-line">Food Made With Care</span>
+    </div>
+    <div class="nav-right">
+      <a href="#" onclick="openPanel('recipes');return false;">Recipes</a>
+      <a href="#" onclick="openPanel('watch');return false;">Watch</a>
+      <a href="#" onclick="openPanel('shop');return false;">Shop</a>
+      <button class="btn-fill" onclick="openModal()" style="font-size:0.68rem;padding:0.6rem 1.2rem">Book a Dinner</button>
+    </div>
+  </nav>
+
+  <div class="main">
+    <div class="hero">
+      <div class="hero-top">
+        <div class="hero-kicker">Food · Craft · Care</div>
+        <h1>Slow food.<br><em>Real flavour.</em><br>No shortcuts.</h1>
+        <p class="hero-desc">NARU is a small food brand — recipes, cooking videos, handmade products, and private dining for people who take food seriously.</p>
+        <div class="hero-actions">
+          <button class="btn-fill" onclick="openModal()">Book a Private Dinner</button>
+          <a href="#" class="btn-ghost" onclick="openPanel('shop');return false;">Shop NARU</a>
+        </div>
+      </div>
+      <div class="hero-bottom">
+        <div class="hero-quote">"The best food comes from patience, good ingredients, and genuine care."</div>
+        <div class="hero-quote-attr">— NARU</div>
+      </div>
+    </div>
+
+    <div class="pillars">
+      <a href="#" class="pillar pillar-recipes" onclick="openPanel('recipes');return false;">
+        <span class="pillar-bg-text">R</span><span class="pillar-icon">🍞</span>
+        <div class="pillar-content">
+          <div class="pillar-label">Explore</div>
+          <div class="pillar-title">Recipes</div>
+          <div class="pillar-desc">Step-by-step guides from our kitchen — bread, ferments, mains, and more.</div>
+          <div class="pillar-arrow">Browse recipes →</div>
+        </div>
+      </a>
+      <a href="#" class="pillar pillar-watch" onclick="openPanel('watch');return false;">
+        <span class="pillar-bg-text">W</span><span class="pillar-icon">🎬</span>
+        <div class="pillar-content">
+          <div class="pillar-label">Watch</div>
+          <div class="pillar-title">Cooking Videos</div>
+          <div class="pillar-desc">Short clips and longer guides — techniques, recipes, and real kitchen moments.</div>
+          <div class="pillar-arrow">Watch now →</div>
+        </div>
+      </a>
+      <a href="#" class="pillar pillar-shop" onclick="openPanel('shop');return false;">
+        <span class="pillar-bg-text">S</span><span class="pillar-icon">🫙</span>
+        <div class="pillar-content">
+          <div class="pillar-label">Made to Order</div>
+          <div class="pillar-title">Shop</div>
+          <div class="pillar-desc">Sourdough, pickles, chilli oil and more — made by hand in small batches.</div>
+          <div class="pillar-arrow">Shop now →</div>
+        </div>
+      </a>
+      <a href="#" class="pillar pillar-book" onclick="openModal();return false;">
+        <span class="pillar-bg-text">B</span><span class="pillar-icon">🍽️</span>
+        <div class="pillar-content">
+          <div class="pillar-label">Private Chef</div>
+          <div class="pillar-title">Book a Dinner</div>
+          <div class="pillar-desc">We come to you — bespoke menus, dinner parties, and supper clubs. From £65pp.</div>
+          <div class="pillar-arrow">Make an enquiry →</div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="footer-strip">
+    <div class="fs-links">
+      <a href="recipes.html">All Recipes</a>
+      <a href="#">Instagram</a>
+      <a href="#">Newsletter</a>
+      <a href="#">Contact</a>
+    </div>
+    <div class="fs-copy">© 2026 NARU · Made slowly, with care.</div>
+  </div>
+</div>
+
+<!-- RECIPES PANEL -->
+<div class="panel" id="panel-recipes">
+  <div class="panel-backdrop" onclick="closePanel('recipes')"></div>
+  <div class="panel-drawer">
+    <div class="drawer-head">
+      <div><div class="drawer-title">Recipes</div><div class="drawer-sub">From our kitchen — updated regularly.</div></div>
+      <button class="drawer-x" onclick="closePanel('recipes')">✕</button>
+    </div>
+    <div class="drawer-body" id="recipes-list"></div>
+  </div>
+</div>
+
+<!-- WATCH PANEL -->
+<div class="panel" id="panel-watch">
+  <div class="panel-backdrop" onclick="closePanel('watch')"></div>
+  <div class="panel-drawer">
+    <div class="drawer-head">
+      <div><div class="drawer-title">Watch</div><div class="drawer-sub">From our kitchen to yours.</div></div>
+      <button class="drawer-x" onclick="closePanel('watch')">✕</button>
+    </div>
+    <div class="drawer-body">
+      <div class="vid-item"><div class="vi-thumb" style="background:linear-gradient(135deg,#354D3C,#243529)">🍞</div><div><div class="vi-cat">Bread</div><div class="vi-name">Scoring & Loading Your Sourdough</div><div class="vi-meta">8 min · Technique</div></div></div>
+      <div class="vid-item"><div class="vi-thumb" style="background:linear-gradient(135deg,#B85C2C,#7A3A18)">🫙</div><div><div class="vi-cat">Fermentation</div><div class="vi-name">Why We Ferment Everything</div><div class="vi-meta">12 min · Philosophy</div></div></div>
+      <div class="vid-item"><div class="vi-thumb" style="background:linear-gradient(135deg,#4A3728,#2E2018)">🔪</div><div><div class="vi-cat">Technique</div><div class="vi-name">Knife Skills That Actually Matter</div><div class="vi-meta">6 min · Basics</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- SHOP PANEL -->
+<div class="panel" id="panel-shop">
+  <div class="panel-backdrop" onclick="closePanel('shop')"></div>
+  <div class="panel-drawer">
+    <div class="drawer-head">
+      <div><div class="drawer-title">Shop</div><div class="drawer-sub">Made by hand, in small batches, to order.</div></div>
+      <button class="drawer-x" onclick="closePanel('shop')">✕</button>
+    </div>
+    <div class="drawer-body">
+      <div class="shop-item"><div class="si-thumb" style="background:#F7F0E3">🍞</div><div><div class="si-name">Country Sourdough</div><div class="si-desc">1kg naturally leavened loaf. 48hrs notice needed.</div></div><div class="si-right"><div class="si-price">£9</div><button class="si-btn" onclick="openModal()">Order</button></div></div>
+      <div class="shop-item"><div class="si-thumb" style="background:#E8EFE9">🫙</div><div><div class="si-name">House Pickles</div><div class="si-desc">Seasonal veg, fermented in-house. 340g jar.</div></div><div class="si-right"><div class="si-price">£6</div><button class="si-btn" onclick="openModal()">Order</button></div></div>
+      <div class="shop-item"><div class="si-thumb" style="background:#F9EDE5">🌶️</div><div><div class="si-name">Chilli Oil</div><div class="si-desc">Slow-infused with toasted spices. Goes on everything.</div></div><div class="si-right"><div class="si-price">£7</div><button class="si-btn" onclick="openModal()">Order</button></div></div>
+      <div class="shop-item"><div class="si-thumb" style="background:#EDE3D0">🍯</div><div><div class="si-name">Sourdough Starter</div><div class="si-desc">A piece of our 3-year-old starter, ready to bake.</div></div><div class="si-right"><div class="si-price">£4</div><button class="si-btn" onclick="openModal()">Order</button></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- BOOKING MODAL -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <button class="modal-x" onclick="closeModal()">✕</button>
+    <div class="modal-ey">Get in touch</div>
+    <h3>Book or Order</h3>
+    <p class="modal-sub">Drop us a message and we'll be in touch within 48 hours.</p>
+    <div class="fg"><label>Your Name</label><input type="text" placeholder="First and last name"></div>
+    <div class="fg"><label>Email</label><input type="email" placeholder="you@example.com"></div>
+    <div class="fg"><label>What are you interested in?</label><select><option>Private Dinner</option><option>Sourdough Order</option><option>Pickles / Chilli Oil</option><option>Sourdough Starter</option><option>Something else</option></select></div>
+    <div class="fg-row"><div class="fg"><label>Date (if relevant)</label><input type="date"></div><div class="fg"><label>Guests</label><input type="number" placeholder="e.g. 8"></div></div>
+    <div class="fg"><label>Message</label><textarea placeholder="Anything helpful — dietary needs, ideas, questions..."></textarea></div>
+    <button class="modal-submit" onclick="document.getElementById('modalOk').classList.add('show')">Send Message</button>
+    <div class="modal-ok" id="modalOk">Message received — we'll be in touch very soon. Thank you! 🙏</div>
+  </div>
+</div>
+
+<script>
+  const STORAGE_KEY = 'naru_recipes';
+
+  const SEED_RECIPES = [
+    {id:1001,title:"Turkish Eggs",description:"The brunch dish that turned a lazy Sunday into a full-blown ritual. Silky poached eggs nestled on garlicky Greek yoghurt, drowned in sizzling Aleppo pepper butter — it's outrageously good for something this simple.",category:"Breakfast",emoji:"🍳",cookTime:"30 mins",servings:"1 person",difficulty:"Intermediate",access:"free",status:"published",featured:false,tags:["Vegetarian","Gluten-Free"],ingredients:[{qty:"2",name:"eggs"},{qty:"2 slices",name:"sourdough"},{qty:"few sprigs",name:"dill"},{qty:"100g",name:"Greek yoghurt"},{qty:"1 clove",name:"garlic (medium)"},{qty:"1 tbsp",name:"butter"},{qty:"1 tbsp",name:"olive oil"},{qty:"1 tsp",name:"Aleppo pepper"},{qty:"1 tsp",name:"lemon juice"}],steps:["Slice bread first. Fill a pan with warm water, bring to boil then simmer. Add yoghurt, a pinch of salt & garlic to a bowl on top of pan. Whip until it reaches room temperature, then turn off heat.","Melt butter until it becomes brown, turn off heat, add olive oil and chilli flakes.","Crack eggs into a fine mesh strainer over a bowl and swirl for ~30 seconds to separate the watery part. Add eggs to a ramekin.","Boil water in a pan & turn down to a very low simmer. Add 1 tbsp lemon juice (or vinegar) and create a vortex. Add eggs for 3–4 mins. Remove eggs to a plate or kitchen towel. Toast bread alongside.","Assemble: add yoghurt, then eggs, then the peppery butter, then dill. Serve with buttered sourdough on the side."],notes:null,addedAt:"2025-01-01T00:00:00.000Z"},
+    {id:1002,title:"Selfish Alchemist",description:"A gin sour with a twist — fruity compot and frothy egg white make this one feel almost too pretty to drink. Almost.",category:"Cocktails",emoji:"🍸",cookTime:"10 mins",servings:"1 person",difficulty:"Easy",access:"free",status:"published",featured:false,tags:["Vegetarian","Vegan"],ingredients:[{qty:"2 shots",name:"gin"},{qty:"1 shot",name:"sugar syrup"},{qty:"1–2",name:"egg whites"},{qty:"1 tbsp",name:"compot"},{qty:"1 shot",name:"lemon juice"}],steps:["Add gin, lemon, sugar syrup & egg white to shaker.","Dry shake with no ice.","Wet shake with ice & 1 tablespoon compot.","Double strain."],notes:"Quite sweet — add more egg white if desired.",addedAt:"2025-01-01T00:00:01.000Z"},
+    {id:1003,title:"Tangerine Sour",description:"Bourbon gets a citrus glow-up. Fresh tangerines, lemon, and a velvet egg-white foam — this one tastes like a sunset in a coupe glass.",category:"Cocktails",emoji:"🍊",cookTime:"10 mins",servings:"1 person",difficulty:"Easy",access:"free",status:"published",featured:false,tags:["Vegetarian","Gluten-Free","Vegan"],ingredients:[{qty:"2",name:"tangerines"},{qty:"1 shot",name:"lemon juice"},{qty:"3 shots",name:"bourbon"},{qty:"1",name:"egg white"},{qty:"few dashes",name:"bitters (orange or normal)"},{qty:"to taste",name:"honey"}],steps:["Combine all ingredients.","Add coil & dry shake.","Add ice & shake.","Double strain."],notes:null,addedAt:"2025-01-01T00:00:02.000Z"},
+    {id:1004,title:"Breda Pear",description:"A showstopper dessert that's essentially a love letter to autumn — fragrant rosemary cake, poached pears, crunchy fennel-almond crumb, and a drizzle of pear liqueur. Best with tea.",category:"Desserts",emoji:"🍐",cookTime:"1 hr 45 mins",servings:"4 people",difficulty:"Advanced",access:"free",status:"published",featured:true,tags:["Vegetarian"],ingredients:[{qty:"94g",name:"butter"},{qty:"56g",name:"caster sugar"},{qty:"2",name:"medium eggs"},{qty:"131g",name:"self-raising flour"},{qty:"3 tbsp",name:"milk"},{qty:"1 sprig",name:"rosemary"},{qty:"1",name:"lemon peel"},{qty:"3 large",name:"pears"},{qty:"180g",name:"caster sugar (for poaching)"},{qty:"½",name:"cinnamon stick"},{qty:"½ tsp",name:"vanilla essence"},{qty:"¾ tsp",name:"fennel seeds"},{qty:"1 tbsp",name:"crushed almonds"}],steps:["Rosemary Cake: Grease cake tin. Set oven to 180°C. Cream sugar & butter together. Add eggs 1 at a time, then flour. Add milk & lemon zest. Add finely chopped rosemary. Add to tin and cook for 45 mins. Once baked, take a small amount out, put in oven to crisp up.","Poached Pears: Add all ingredients to pan apart from pears. Add peeled pears, turn on heat & let boil, then drop to simmer. Once cooked, turn heat off & allow to cool. Place in fridge until serving.","Crumb: Grind ½ tsp sugar, fennel seeds & ¼ tsp cinnamon until a coarse powder.","Assemble: Cake at bottom. Add pear juice. Pears on next (sliced into thin pieces). Cream or ice cream. Crumbs from crispy cake bits. Crumb of nuts & fennel seeds on top."],notes:"Goes great with tea.",addedAt:"2025-01-01T00:00:03.000Z"},
+    {id:1005,title:"Eggs Benedict",description:"The weekend project worth every minute — crispy bacon, perfectly poached eggs, and a glossy homemade hollandaise that you absolutely made from scratch. Goes great with fresh OJ.",category:"Breakfast",emoji:"🥚",cookTime:"45 mins",servings:"4 people",difficulty:"Intermediate",access:"free",status:"published",featured:false,tags:["Gluten-Free"],ingredients:[{qty:"8 rashers",name:"bacon"},{qty:"8",name:"eggs"},{qty:"½ loaf",name:"sourdough"},{qty:"3",name:"egg yolks (hollandaise)"},{qty:"1 tbsp",name:"lemon juice"},{qty:"1 tsp",name:"Dijon mustard"},{qty:"¼ tsp",name:"salt"},{qty:"pinch",name:"cayenne pepper"},{qty:"113g",name:"unsalted butter / ghee"},{qty:"12 spears",name:"asparagus"}],steps:["Put bacon in the oven for 10–20 mins, flipping halfway. Slice bread (4 slices) & toast while eggs poach.","Start poaching eggs: crack egg into sieve to remove thin egg parts. Poach in barely simmering water with 1 tbsp vinegar & a whirlpool. Aim for 2 at a time at 3 minutes. Once cooked, place on a kitchen towel.","Make hollandaise: melt butter in microwave (~45 seconds). Add lemon, mustard, salt & cayenne to egg yolks & whisk. Stream in the butter until emulsified — be careful it doesn't scramble.","Once eggs are poached, steam asparagus for a few minutes.","Assemble: bread with butter → bacon × 2 → eggs × 2 → hollandaise → asparagus on the side → sprinkle of flaky salt."],notes:"If hollandaise is too thick, add more butter. If too thin, heat over boiling water but keep an eye on it.",addedAt:"2025-01-01T00:00:04.000Z"},
+    {id:1006,title:"Picante",description:"Tequila, chilli, honey and coriander — it's a firestarter in the best possible way. Start with less chilli and work your way up, because there's no going back once it's in.",category:"Cocktails",emoji:"🌶️",cookTime:"5 mins",servings:"2 people",difficulty:"Easy",access:"free",status:"published",featured:false,tags:["Vegetarian"],ingredients:[{qty:"50ml",name:"tequila"},{qty:"25ml",name:"lime juice"},{qty:"1",name:"red chilli"},{qty:"2–3 sprigs",name:"coriander"},{qty:"25ml",name:"honey"}],steps:["Muddle chopped chilli in shaker.","Slap coriander & add to shaker.","Add tequila, lime & honey. Shake & pour.","Garnish with chilli, lime slice & coriander sprig."],notes:"Shake with less chilli & coriander first to test your spice levels.",addedAt:"2025-01-01T00:00:05.000Z"},
+    {id:1007,title:"Tiramisu",description:"The only tiramisu recipe you'll ever need — rich mascarpone cream, coffee-soaked ladyfingers, and a generous hand with the liqueur. Make it the night before and try not to eat half of it immediately.",category:"Desserts",emoji:"☕",cookTime:"30 mins + 4 hrs chilling",servings:"8 people",difficulty:"Intermediate",access:"free",status:"published",featured:false,tags:[],ingredients:[{qty:"6 large",name:"egg yolks"},{qty:"180g",name:"caster sugar"},{qty:"282g",name:"mascarpone"},{qty:"417g",name:"double cream"},{qty:"30",name:"ladyfingers"},{qty:"237g",name:"coffee"},{qty:"118g",name:"liqueur (coffee or triple sec)"},{qty:"80g",name:"cocoa"}],steps:["Whip eggs & sugar in a double boiler with simmering water for 10 mins — should get thick and yellow.","Remove from heat & let cool.","Add room temperature mascarpone and continue to blend using hand whisk. Increase speed.","Separately, whip fresh double cream slowly, increasing speed to stiff peaks.","Add cream slowly to mixture until fully combined.","Dip ladyfingers in cold/room-temp coffee with added liqueur.","Assemble tiramisu in layers.","Refrigerate a minimum of 4 hours."],notes:null,addedAt:"2025-01-01T00:00:06.000Z"},
+    {id:1008,title:"Maple Butter Loaf",description:"Dense, moist and unapologetically indulgent — this loaf cake is finished with a sticky maple butter glaze that soaks straight in. Rated 4 stars for a reason.",category:"Bread & Baking",emoji:"🍞",cookTime:"1 hr",servings:"8 people",difficulty:"Easy",access:"free",status:"published",featured:false,tags:["Vegetarian"],ingredients:[{qty:"120g",name:"unsalted butter"},{qty:"235g",name:"plain flour"},{qty:"160g",name:"caster sugar"},{qty:"2 tsp",name:"baking powder"},{qty:"¼ tsp",name:"sea salt"},{qty:"3 large",name:"eggs"},{qty:"3 tbsp",name:"neutral oil"},{qty:"40ml",name:"maple syrup"},{qty:"100g",name:"sour cream"},{qty:"80g",name:"maple syrup (glaze)"},{qty:"20g",name:"unsalted butter (glaze)"},{qty:"pinch",name:"flaky sea salt"}],steps:["Preheat oven to 180°C. Combine all dry ingredients. Whisk butter, eggs, oil, maple syrup & sour cream together. Mix wet into dry until just combined. Pour into greased loaf tin.","Bake for 45 mins until a skewer comes out clean.","Make glaze by melting butter & maple syrup together. Pour over warm loaf & finish with flaky salt."],notes:"If using self-raising flour, use ¼ tsp baking powder instead of 2 tsp.",addedAt:"2025-01-01T00:00:07.000Z"},
+    {id:1009,title:"Brown Sugar Custard",description:"Lush, velvety and barely sweet — this stovetop custard made with light muscovado sugar has a depth of flavour that shop-bought can only dream of. Non-dairy milk works beautifully too.",category:"Desserts",emoji:"🍮",cookTime:"20 mins",servings:"6 people",difficulty:"Easy",access:"free",status:"published",featured:false,tags:["Vegetarian"],ingredients:[{qty:"800ml",name:"milk"},{qty:"200ml",name:"double cream"},{qty:"1 tsp",name:"vanilla paste"},{qty:"3 large",name:"egg yolks"},{qty:"90g",name:"light muscovado sugar"},{qty:"2 tbsp",name:"cornflour"}],steps:["Add milk, cream & vanilla to a saucepan and heat until hot, just before boiling.","Add egg yolk, sugar & cornflour to a separate bowl and whisk until smooth.","Add a small amount of hot milk to eggs, whisking constantly. Add rest of milk in 3 goes.","Add back to pan and cook on a low heat for 5–7 mins until it reaches the right thickness, stirring constantly."],notes:"Non-dairy milk works well as a substitute.",addedAt:"2025-01-01T00:00:08.000Z"}
+  ];
+
+  function seedRecipes(){
+    // Only seed if localStorage is empty or has no NARU seed recipes yet
+    const existing = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    const alreadySeeded = existing.some(r => r.id >= 1001 && r.id <= 1009);
+    if(!alreadySeeded){
+      const merged = [...SEED_RECIPES, ...existing.filter(r => !SEED_RECIPES.find(s => s.id === r.id))];
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+    }
+  }
+
+  function getRecipes() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch(e) { return []; } }
+
+  function renderRecipes() {
+    const recipes = getRecipes();
+    const el = document.getElementById('recipes-list');
+    if (!recipes.length) {
+      el.innerHTML = '<div class="empty-state"><p>No recipes yet — check back soon! 🍳</p></div>';
+      return;
+    }
+    el.innerHTML = recipes.map(r => `
+      <a class="recipe-item" href="recipes.html">
+        <div class="ri-thumb">${r.emoji || '🍽️'}</div>
+        <div>
+          <div class="ri-cat">${r.category}</div>
+          <div class="ri-name">${r.title}</div>
+          <div class="ri-meta">⏱ ${r.cookTime} · ${r.difficulty}</div>
+        </div>
+      </a>`).join('');
+  }
+
+  seedRecipes();
+
+  function openModal() { document.getElementById('overlay').classList.add('show'); document.getElementById('modalOk').classList.remove('show'); }
+  function closeModal() { document.getElementById('overlay').classList.remove('show'); }
+  document.getElementById('overlay').addEventListener('click', e => { if (e.target === document.getElementById('overlay')) closeModal(); });
+
+  function openPanel(name) { if (name === 'recipes') renderRecipes(); document.getElementById('panel-' + name).classList.add('show'); }
+  function closePanel(name) { document.getElementById('panel-' + name).classList.remove('show'); }
+  document.querySelectorAll('a[href="#"]').forEach(a => a.addEventListener('click', e => e.preventDefault()));
+</script>
+</body>
+</html>

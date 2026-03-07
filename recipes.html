@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recipes — NARU</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Jost:wght@300;400;500&family=Cormorant+Garamond:ital,wght@1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{--cream:#FDFAF4;--warm:#F4EDE0;--spice:#B85C2C;--forest:#354D3C;--ink:#1C1610;--stone:#7C7060;--gold:#C4913A;--border:rgba(28,22,16,0.1);}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--cream);color:var(--ink);font-family:'Jost',sans-serif;font-weight:300;min-height:100vh;}
+
+  nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem 2.5rem;border-bottom:1px solid var(--border);background:var(--cream);position:sticky;top:0;z-index:10;}
+  .logo{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;letter-spacing:0.16em;text-decoration:none;color:var(--ink);}
+  .logo-line{font-size:0.52rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--stone);display:block;margin-top:1px;}
+  .nav-right{display:flex;gap:1.8rem;align-items:center;}
+  nav a{color:var(--stone);text-decoration:none;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:500;transition:color 0.2s;}
+  nav a:hover{color:var(--spice);}
+
+  .page-head{background:var(--warm);border-bottom:1px solid var(--border);padding:3rem 4rem 2.5rem;}
+  .eyebrow{font-size:0.62rem;letter-spacing:0.35em;text-transform:uppercase;color:var(--spice);margin-bottom:0.8rem;display:flex;align-items:center;gap:0.7rem;}
+  .eyebrow::before{content:'';width:20px;height:1px;background:var(--spice);}
+  h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,4vw,3rem);font-weight:400;line-height:1.1;margin-bottom:0.5rem;}
+  h1 em{font-style:italic;color:var(--spice);}
+  .head-sub{font-size:0.88rem;color:var(--stone);line-height:1.7;}
+
+  /* FILTERS */
+  .filters-bar{padding:1.2rem 4rem;border-bottom:1px solid var(--border);display:flex;gap:0.6rem;flex-wrap:wrap;align-items:center;}
+  .fb{background:white;border:1px solid var(--border);padding:0.38rem 1rem;border-radius:100px;font-size:0.7rem;font-family:'Jost',sans-serif;font-weight:500;letter-spacing:0.06em;cursor:pointer;transition:all 0.2s;color:var(--stone);}
+  .fb:hover,.fb.active{background:var(--spice);border-color:var(--spice);color:white;}
+  .fb.premium-filter.active{background:var(--gold);border-color:var(--gold);}
+  .filter-sep{width:1px;height:20px;background:var(--border);margin:0 0.2rem;}
+
+  /* GRID */
+  .recipes-grid{max-width:1100px;margin:0 auto;padding:2.5rem 4rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.4rem;}
+
+  /* CARD */
+  .recipe-card{background:white;border:1px solid var(--border);border-radius:4px;overflow:hidden;transition:transform 0.3s,box-shadow 0.3s;cursor:pointer;position:relative;}
+  .recipe-card:hover{transform:translateY(-4px);box-shadow:0 12px 36px rgba(28,22,16,0.09);}
+  .recipe-card.is-featured{border-color:rgba(53,77,60,0.25);}
+  .rc-thumb{height:140px;display:flex;align-items:center;justify-content:center;font-size:3.2rem;position:relative;}
+  /* Premium lock overlay */
+  .premium-lock{position:absolute;inset:0;background:rgba(28,22,16,0.45);backdrop-filter:blur(3px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.4rem;}
+  .premium-lock span{font-size:1.8rem;}
+  .premium-lock p{font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;color:white;font-family:'Jost',sans-serif;font-weight:500;}
+  /* Featured ribbon */
+  .featured-ribbon{position:absolute;top:0.6rem;left:0.6rem;background:var(--forest);color:white;font-size:0.52rem;letter-spacing:0.14em;text-transform:uppercase;padding:0.18rem 0.55rem;border-radius:100px;font-family:'Jost',sans-serif;font-weight:500;}
+  /* Premium badge on card */
+  .premium-badge{position:absolute;top:0.6rem;right:0.6rem;background:var(--gold);color:white;font-size:0.52rem;letter-spacing:0.14em;text-transform:uppercase;padding:0.18rem 0.55rem;border-radius:100px;font-family:'Jost',sans-serif;font-weight:500;}
+
+  .rc-body{padding:1.3rem;}
+  .rc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.35rem;}
+  .rc-cat{font-size:0.58rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--spice);}
+  .rc-title{font-family:'Playfair Display',serif;font-size:1rem;font-weight:500;line-height:1.3;margin-bottom:0.35rem;}
+  .rc-desc{font-size:0.76rem;color:var(--stone);line-height:1.6;margin-bottom:0.8rem;}
+  .rc-tags{display:flex;flex-wrap:wrap;gap:0.3rem;margin-bottom:0.8rem;}
+  .rc-tag{font-size:0.58rem;background:var(--warm);border:1px solid var(--border);padding:0.1rem 0.5rem;border-radius:100px;color:var(--stone);}
+  .rc-foot{display:flex;gap:1rem;padding-top:0.8rem;border-top:1px solid var(--border);align-items:center;}
+  .rc-meta{font-size:0.65rem;color:var(--stone);}
+  .rc-link{margin-left:auto;font-size:0.65rem;color:var(--spice);font-weight:500;letter-spacing:0.06em;}
+
+  .empty-state{grid-column:1/-1;text-align:center;padding:5rem 2rem;}
+  .es-icon{font-size:3rem;margin-bottom:1rem;}
+  .empty-state h3{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:400;margin-bottom:0.5rem;}
+  .empty-state p{font-size:0.85rem;color:var(--stone);line-height:1.7;margin-bottom:1.5rem;}
+  .empty-state a{color:var(--spice);font-size:0.75rem;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;border-bottom:1px solid var(--spice);}
+
+  /* DETAIL PANEL */
+  .detail-overlay{position:fixed;inset:0;z-index:50;display:none;align-items:stretch;}
+  .detail-overlay.show{display:flex;}
+  .detail-backdrop{flex:1;background:rgba(28,22,16,0.4);backdrop-filter:blur(6px);cursor:pointer;}
+  .detail-drawer{width:min(600px,95vw);background:var(--cream);border-left:1px solid var(--border);overflow-y:auto;animation:slideIn 0.35s cubic-bezier(0.22,1,0.36,1) both;display:flex;flex-direction:column;}
+  @keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+  .detail-head{padding:2rem 2.5rem 1.5rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--cream);z-index:1;display:flex;justify-content:space-between;align-items:flex-start;}
+  .detail-close{background:var(--warm);border:1px solid var(--border);width:30px;height:30px;border-radius:50%;cursor:pointer;color:var(--stone);display:flex;align-items:center;justify-content:center;font-size:0.7rem;flex-shrink:0;margin-left:1rem;transition:all 0.2s;}
+  .detail-close:hover{color:var(--spice);}
+  .detail-cat{font-size:0.6rem;letter-spacing:0.28em;text-transform:uppercase;color:var(--spice);margin-bottom:0.4rem;display:flex;gap:0.6rem;align-items:center;flex-wrap:wrap;}
+  .detail-premium-badge{background:var(--gold);color:white;font-size:0.5rem;letter-spacing:0.14em;text-transform:uppercase;padding:0.15rem 0.5rem;border-radius:100px;}
+  .detail-title{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:400;line-height:1.15;margin-bottom:0.5rem;}
+  .detail-meta{display:flex;gap:1.5rem;flex-wrap:wrap;}
+  .dm{font-size:0.7rem;color:var(--stone);}
+  .detail-body{padding:2rem 2.5rem;flex:1;}
+  .detail-emoji{font-size:4rem;margin-bottom:1.5rem;display:block;}
+  .detail-desc{font-size:0.9rem;color:var(--stone);line-height:1.8;margin-bottom:2rem;font-style:italic;border-left:2px solid var(--spice);padding-left:1rem;}
+  .detail-section{margin-bottom:2rem;}
+  .ds-title{font-size:0.62rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--spice);margin-bottom:1rem;display:flex;align-items:center;gap:0.6rem;}
+  .ds-title::before{content:'';width:16px;height:1px;background:var(--spice);}
+  .ing-list-view{list-style:none;}
+  .ing-list-view li{display:flex;gap:1rem;padding:0.6rem 0;border-bottom:1px solid var(--border);font-size:0.85rem;align-items:baseline;}
+  .ing-list-view li:last-child{border:none;}
+  .ing-qty{font-weight:500;color:var(--spice);min-width:60px;flex-shrink:0;}
+  .steps-list{list-style:none;}
+  .steps-list li{display:grid;grid-template-columns:32px 1fr;gap:1rem;padding:1rem 0;border-bottom:1px solid var(--border);font-size:0.88rem;line-height:1.7;color:var(--stone);}
+  .steps-list li:last-child{border:none;}
+  .step-n{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--spice);font-weight:400;padding-top:0.1rem;}
+  .detail-notes{background:var(--warm);border-radius:4px;padding:1.2rem 1.5rem;font-size:0.82rem;color:var(--stone);line-height:1.75;border-left:2px solid var(--gold);}
+  .detail-notes-label{font-size:0.58rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:0.5rem;}
+  .detail-tags{display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1.5rem;}
+  .detail-tag{font-size:0.65rem;background:var(--warm);border:1px solid var(--border);padding:0.2rem 0.6rem;border-radius:100px;color:var(--stone);}
+
+  /* Premium gate inside drawer */
+  .premium-gate{text-align:center;padding:3rem 2rem;background:var(--warm);border-radius:4px;margin:1rem 0;}
+  .premium-gate .pg-icon{font-size:2.5rem;margin-bottom:1rem;}
+  .premium-gate h3{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:400;margin-bottom:0.5rem;}
+  .premium-gate p{font-size:0.8rem;color:var(--stone);line-height:1.7;margin-bottom:1.2rem;}
+  .premium-gate .pg-btn{display:inline-block;background:var(--gold);color:white;padding:0.7rem 1.6rem;border-radius:2px;font-size:0.72rem;font-family:'Jost',sans-serif;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;text-decoration:none;cursor:not-allowed;opacity:0.75;}
+  .premium-gate .pg-note{font-size:0.65rem;color:var(--stone);margin-top:0.8rem;}
+
+  @media(max-width:768px){
+    nav{padding:1rem 1.5rem;}
+    .page-head,.filters-bar{padding-left:1.5rem;padding-right:1.5rem;}
+    .recipes-grid{padding:2rem 1.5rem;}
+    .detail-body,.detail-head{padding-left:1.5rem;padding-right:1.5rem;}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html">
+    <span class="logo">NARU</span>
+    <span class="logo-line">Food Made With Care</span>
+  </a>
+  <div class="nav-right">
+    <a href="index.html">← Home</a>
+    <a href="admin.html" style="color:var(--spice)">+ Add Recipe</a>
+  </div>
+</nav>
+
+<div class="page-head">
+  <div class="eyebrow">From the Kitchen</div>
+  <h1>All <em>Recipes.</em></h1>
+  <p class="head-sub">Everything we've made and written up — updated as we go.</p>
+</div>
+
+<div class="filters-bar" id="filtersBar"></div>
+<div class="recipes-grid" id="grid"></div>
+
+<!-- DETAIL PANEL -->
+<div class="detail-overlay" id="detailOverlay">
+  <div class="detail-backdrop" onclick="closeDetail()"></div>
+  <div class="detail-drawer">
+    <div class="detail-head">
+      <div>
+        <div class="detail-cat" id="d-cat"></div>
+        <div class="detail-title" id="d-title"></div>
+        <div class="detail-meta" id="d-meta"></div>
+      </div>
+      <button class="detail-close" onclick="closeDetail()">✕</button>
+    </div>
+    <div class="detail-body" id="d-body"></div>
+  </div>
+</div>
+
+<script>
+  const KEY = 'naru_recipes';
+
+  const SEED_RECIPES = [
+    {id:1001,title:"Turkish Eggs",description:"The brunch dish that turned a lazy Sunday into a full-blown ritual. Silky poached eggs nestled on garlicky Greek yoghurt, drowned in sizzling Aleppo pepper butter — it's outrageously good for something this simple.",category:"Breakfast",emoji:"🍳",cookTime:"30 mins",servings:"1 person",difficulty:"Intermediate",access:"free",status:"published",featured:false,tags:["Vegetarian","Gluten-Free"],ingredients:[{qty:"2",name:"eggs"},{qty:"2 slices",name:"sourdough"},{qty:"few sprigs",name:"dill"},{qty:"100g",name:"Greek yoghurt"},{qty:"1 clove",name:"garlic (medium)"},{qty:"1 tbsp",name:"butter"},{qty:"1 tbsp",name:"olive oil"},{qty:"1 tsp",name:"Aleppo pepper"},{qty:"1 tsp",name:"lemon juice"}],steps:["Slice bread first. Fill a pan with warm water, bring to boil then simmer. Add yoghurt, a pinch of salt & garlic to a bowl on top of pan. Whip until it reaches room temperature, then turn off heat.","Melt butter until it becomes brown, turn off heat, add olive oil and chilli flakes.","Crack eggs into a fine mesh strainer over a bowl and swirl for ~30 seconds to separate the watery part. Add eggs to a ramekin.","Boil water in a pan & turn down to a very low simmer. Add 1 tbsp lemon juice (or vinegar) and create a vortex. Add eggs for 3–4 mins. Remove eggs to a plate or kitchen towel. Toast bread alongside.","Assemble: add yoghurt, then eggs, then the peppery butter, then dill. Serve with buttered sourdough on the side."],notes:null,addedAt:"2025-01-01T00:00:00.000Z"},
+    {id:1002,title:"Selfish Alchemist",description:"A gin sour with a twist — fruity compot and frothy egg white make this one feel almost too pretty to drink. Almost.",category:"Cocktails",emoji:"🍸",cookTime:"10 mins",servings:"1 person",difficulty:"Easy",access:"free",status:"published",featured:false,tags:["Vegetarian","Vegan"],ingredients:[{qty:"2 shots",name:"gin"},{qty:"1 shot",name:"sugar syrup"},{qty:"1–2",name:"egg whites"},{qty:"1 tbsp",name:"compot"},{qty:"1 shot",name:"lemon juice"}],steps:["Add gin, lemon, sugar syrup & egg white to shaker.","Dry shake with no ice.","Wet shake with ice & 1 tablespoon compot.","Double strain."],notes:"Quite sweet — add more egg white if desired.",addedAt:"2025-01-01T00:00:01.000Z"},
+    {id:1003,title:"Tangerine Sour",description:"Bourbon gets a citrus glow-up. Fresh tangerines, lemon, and a velvet egg-white foam — this one tastes like a sunset in a coupe glass.",category:"Cocktails",emoji:"🍊",cookTime:"10 mins",servings:"1 person",difficulty:"Easy",access:"free",status:"published",featured:false,tags:["Vegetarian","Gluten-Free","Vegan"],ingredients:[{qty:"2",name:"tangerines"},{qty:"1 shot",name:"lemon juice"},{qty:"3 shots",name:"bourbon"},{qty:"1",name:"egg white"},{qty:"few dashes",name:"bitters (orange or normal)"},{qty:"to taste",name:"honey"}],steps:["Combine all ingredients.","Add coil & dry shake.","Add ice & shake.","Double strain."],notes:null,addedAt:"2025-01-01T00:00:02.000Z"},
+    {id:1004,title:"Breda Pear",description:"A showstopper dessert that's essentially a love letter to autumn — fragrant rosemary cake, poached pears, crunchy fennel-almond crumb, and a drizzle of pear liqueur. Best with tea.",category:"Desserts",emoji:"🍐",cookTime:"1 hr 45 mins",servings:"4 people",difficulty:"Advanced",access:"free",status:"published",featured:true,tags:["Vegetarian"],ingredients:[{qty:"94g",name:"butter"},{qty:"56g",name:"caster sugar"},{qty:"2",name:"medium eggs"},{qty:"131g",name:"self-raising flour"},{qty:"3 tbsp",name:"milk"},{qty:"1 sprig",name:"rosemary"},{qty:"1",name:"lemon peel"},{qty:"3 large",name:"pears"},{qty:"180g",name:"caster sugar (for poaching)"},{qty:"½",name:"cinnamon stick"},{qty:"½ tsp",name:"vanilla essence"},{qty:"¾ tsp",name:"fennel seeds"},{qty:"1 tbsp",name:"crushed almonds"}],steps:["Rosemary Cake: Grease cake tin. Set oven to 180°C. Cream sugar & butter together. Add eggs 1 at a time, then flour. Add milk & lemon zest. Add finely chopped rosemary. Add to tin and cook for 45 mins. Once baked, take a small amount out, put in oven to crisp up.","Poached Pears: Add all ingredients to pan apart from pears. Add peeled pears, turn on heat & let boil, then drop to simmer. Once cooked, turn heat off & allow to cool. Place in fridge until serving.","Crumb: Grind ½ tsp sugar, fennel seeds & ¼ tsp cinnamon until a coarse powder.","Assemble: Cake at bottom. Add pear juice. Pears on next (sliced into thin pieces). Cream or ice cream. Crumbs from crispy cake bits. Crumb of nuts & fennel seeds on top."],notes:"Goes great with tea.",addedAt:"2025-01-01T00:00:03.000Z"},
+    {id:1005,title:"Eggs Benedict",description:"The weekend project worth every minute — crispy bacon, perfectly poached eggs, and a glossy homemade hollandaise that you absolutely made from scratch. Goes great with fresh OJ.",category:"Breakfast",emoji:"🥚",cookTime:"45 mins",servings:"4 people",difficulty:"Intermediate",access:"free",status:"published",featured:false,tags:["Gluten-Free"],ingredients:[{qty:"8 rashers",name:"bacon"},{qty:"8",name:"eggs"},{qty:"½ loaf",name:"sourdough"},{qty:"3",name:"egg yolks (hollandaise)"},{qty:"1 tbsp",name:"lemon juice"},{qty:"1 tsp",name:"Dijon mustard"},{qty:"¼ tsp",name:"salt"},{qty:"pinch",name:"cayenne pepper"},{qty:"113g",name:"unsalted butter / ghee"},{qty:"12 spears",name:"asparagus"}],steps:["Put bacon in the oven for 10–20 mins, flipping halfway. Slice bread (4 slices) & toast while eggs poach.","Start poaching eggs: crack egg into sieve to remove thin egg parts. Poach in barely simmering water with 1 tbsp vinegar & a whirlpool. Aim for 2 at a time at 3 minutes. Once cooked, place on a kitchen towel.","Make hollandaise: melt butter in microwave (~45 seconds). Add lemon, mustard, salt & cayenne to egg yolks & whisk. Stream in the butter until emulsified — be careful it doesn't scramble.","Once eggs are poached, steam asparagus for a few minutes.","Assemble: bread with butter → bacon × 2 → eggs × 2 → hollandaise → asparagus on the side → sprinkle of flaky salt."],notes:"If hollandaise is too thick, add more butter. If too thin, heat over boiling water but keep an eye on it.",addedAt:"2025-01-01T00:00:04.000Z"},
+    {id:1006,title:"Picante",description:"Tequila, chilli, honey and coriander — it's a firestarter in the best possible way. Start with less chilli and work your way up, because there's no going back once it's in.",category:"Cocktails",emoji:"🌶️",cookTime:"5 mins",servings:"2 people",difficulty:"Easy",access:"free",status:"published",featured:false,tags:["Vegetarian"],ingredients:[{qty:"50ml",name:"tequila"},{qty:"25ml",name:"lime juice"},{qty:"1",name:"red chilli"},{qty:"2–3 sprigs",name:"coriander"},{qty:"25ml",name:"honey"}],steps:["Muddle chopped chilli in shaker.","Slap coriander & add to shaker.","Add tequila, lime & honey. Shake & pour.","Garnish with chilli, lime slice & coriander sprig."],notes:"Shake with less chilli & coriander first to test your spice levels.",addedAt:"2025-01-01T00:00:05.000Z"},
+    {id:1007,title:"Tiramisu",description:"The only tiramisu recipe you'll ever need — rich mascarpone cream, coffee-soaked ladyfingers, and a generous hand with the liqueur. Make it the night before and try not to eat half of it immediately.",category:"Desserts",emoji:"☕",cookTime:"30 mins + 4 hrs chilling",servings:"8 people",difficulty:"Intermediate",access:"free",status:"published",featured:false,tags:[],ingredients:[{qty:"6 large",name:"egg yolks"},{qty:"180g",name:"caster sugar"},{qty:"282g",name:"mascarpone"},{qty:"417g",name:"double cream"},{qty:"30",name:"ladyfingers"},{qty:"237g",name:"coffee"},{qty:"118g",name:"liqueur (coffee or triple sec)"},{qty:"80g",name:"cocoa"}],steps:["Whip eggs & sugar in a double boiler with simmering water for 10 mins — should get thick and yellow.","Remove from heat & let cool.","Add room temperature mascarpone and continue to blend using hand whisk. Increase speed.","Separately, whip fresh double cream slowly, increasing speed to stiff peaks.","Add cream slowly to mixture until fully combined.","Dip ladyfingers in cold/room-temp coffee with added liqueur.","Assemble tiramisu in layers.","Refrigerate a minimum of 4 hours."],notes:null,addedAt:"2025-01-01T00:00:06.000Z"},
+    {id:1008,title:"Maple Butter Loaf",description:"Dense, moist and unapologetically indulgent — this loaf cake is finished with a sticky maple butter glaze that soaks straight in. Rated 4 stars for a reason.",category:"Bread & Baking",emoji:"🍞",cookTime:"1 hr",servings:"8 people",difficulty:"Easy",access:"free",status:"published",featured:false,tags:["Vegetarian"],ingredients:[{qty:"120g",name:"unsalted butter"},{qty:"235g",name:"plain flour"},{qty:"160g",name:"caster sugar"},{qty:"2 tsp",name:"baking powder"},{qty:"¼ tsp",name:"sea salt"},{qty:"3 large",name:"eggs"},{qty:"3 tbsp",name:"neutral oil"},{qty:"40ml",name:"maple syrup"},{qty:"100g",name:"sour cream"},{qty:"80g",name:"maple syrup (glaze)"},{qty:"20g",name:"unsalted butter (glaze)"},{qty:"pinch",name:"flaky sea salt"}],steps:["Preheat oven to 180°C. Combine all dry ingredients. Whisk butter, eggs, oil, maple syrup & sour cream together. Mix wet into dry until just combined. Pour into greased loaf tin.","Bake for 45 mins until a skewer comes out clean.","Make glaze by melting butter & maple syrup together. Pour over warm loaf & finish with flaky salt."],notes:"If using self-raising flour, use ¼ tsp baking powder instead of 2 tsp.",addedAt:"2025-01-01T00:00:07.000Z"},
+    {id:1009,title:"Brown Sugar Custard",description:"Lush, velvety and barely sweet — this stovetop custard made with light muscovado sugar has a depth of flavour that shop-bought can only dream of. Non-dairy milk works beautifully too.",category:"Desserts",emoji:"🍮",cookTime:"20 mins",servings:"6 people",difficulty:"Easy",access:"free",status:"published",featured:false,tags:["Vegetarian"],ingredients:[{qty:"800ml",name:"milk"},{qty:"200ml",name:"double cream"},{qty:"1 tsp",name:"vanilla paste"},{qty:"3 large",name:"egg yolks"},{qty:"90g",name:"light muscovado sugar"},{qty:"2 tbsp",name:"cornflour"}],steps:["Add milk, cream & vanilla to a saucepan and heat until hot, just before boiling.","Add egg yolk, sugar & cornflour to a separate bowl and whisk until smooth.","Add a small amount of hot milk to eggs, whisking constantly. Add rest of milk in 3 goes.","Add back to pan and cook on a low heat for 5–7 mins until it reaches the right thickness, stirring constantly."],notes:"Non-dairy milk works well as a substitute.",addedAt:"2025-01-01T00:00:08.000Z"}
+  ];
+
+  function seedRecipes(){
+    const existing = JSON.parse(localStorage.getItem(KEY) || '[]');
+    const alreadySeeded = existing.some(r => r.id >= 1001 && r.id <= 1009);
+    if(!alreadySeeded){
+      const merged = [...SEED_RECIPES, ...existing.filter(r => !SEED_RECIPES.find(s => s.id === r.id))];
+      localStorage.setItem(KEY, JSON.stringify(merged));
+    }
+  }
+  let currentFilter = 'all';
+  let currentAccess = 'all';
+  let recipes = [];
+
+  const COLORS = {'Bread & Baking':'#F7F0E3','Fermentation':'#E8EFE9','Mains':'#F9EDE5','Condiments':'#FBF3E4','Breakfast':'#EDE3D0','Baking':'#F7F0E3','Desserts':'#FEF0F5','Snacks':'#F0F4E8','Soups':'#FFF3E8'};
+  function tc(cat){ return COLORS[cat]||'#F4EDE0'; }
+
+  function load(){
+    seedRecipes();
+    try{ recipes=JSON.parse(localStorage.getItem(KEY))||[]; }catch(e){ recipes=[]; }
+    // only show published recipes on public page
+    recipes=recipes.filter(r=>r.status!=='draft');
+    // featured first
+    recipes=[...recipes].sort((a,b)=>(b.featured?1:0)-(a.featured?1:0));
+  }
+
+  function renderFilters(){
+    const cats=[...new Set(recipes.map(r=>r.category).filter(Boolean))];
+    const hasPremium=recipes.some(r=>r.access==='premium');
+
+    let html=`<button class="fb ${currentFilter==='all'?'active':''}" onclick="setFilter('all',this)">All</button>`;
+    cats.forEach(c=>{
+      html+=`<button class="fb ${currentFilter===c?'active':''}" onclick="setFilter('${c}',this)">${c}</button>`;
+    });
+    if(hasPremium){
+      html+=`<div class="filter-sep"></div>`;
+      html+=`<button class="fb premium-filter ${currentAccess==='free'?'active':''}" onclick="setAccess('free',this)">🆓 Free only</button>`;
+      html+=`<button class="fb premium-filter ${currentAccess==='premium'?'active':''}" onclick="setAccess('premium',this)">⭐ Premium</button>`;
+    }
+    document.getElementById('filtersBar').innerHTML=html;
+  }
+
+  function setFilter(cat, btn){
+    currentFilter=cat;
+    renderFilters();
+    renderGrid();
+  }
+  function setAccess(val, btn){
+    currentAccess=currentAccess===val?'all':val;
+    renderFilters();
+    renderGrid();
+  }
+
+  function renderGrid(){
+    let filtered=currentFilter==='all'?recipes:recipes.filter(r=>r.category===currentFilter);
+    if(currentAccess!=='all') filtered=filtered.filter(r=>(r.access||'free')===currentAccess);
+
+    const grid=document.getElementById('grid');
+    if(!filtered.length){
+      grid.innerHTML=`<div class="empty-state"><div class="es-icon">🍳</div><h3>No recipes yet</h3><p>Head to the admin page to add your first recipe.</p><a href="admin.html">Add a recipe →</a></div>`;
+      return;
+    }
+    grid.innerHTML=filtered.map(r=>{
+      const idx=recipes.indexOf(r);
+      const isPremium=r.access==='premium';
+      const isFeatured=r.featured;
+      const tagsHtml=r.tags&&r.tags.length?`<div class="rc-tags">${r.tags.map(t=>`<span class="rc-tag">${t}</span>`).join('')}</div>`:'';
+      return `<div class="recipe-card${isFeatured?' is-featured':''}" onclick="openDetail(${idx})">
+        <div class="rc-thumb" style="background:${tc(r.category)}">
+          ${r.emoji||'🍽️'}
+          ${isFeatured?'<div class="featured-ribbon">⭑ Featured</div>':''}
+          ${isPremium?'<div class="premium-badge">⭐ Premium</div>':''}
+        </div>
+        <div class="rc-body">
+          <div class="rc-cat">${r.category||''}</div>
+          <div class="rc-title">${r.title}</div>
+          ${r.description?`<div class="rc-desc">${r.description}</div>`:''}
+          ${tagsHtml}
+          <div class="rc-foot">
+            <span class="rc-meta">⏱ ${r.cookTime}</span>
+            <span class="rc-meta">· ${r.difficulty}</span>
+            <span class="rc-link">${isPremium?'⭐ Members only':'View recipe →'}</span>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function openDetail(i){
+    const r=recipes[i];
+    const isPremium=r.access==='premium';
+
+    document.getElementById('d-cat').innerHTML=`${r.category||''}${isPremium?' <span class="detail-premium-badge">⭐ Premium</span>':''}`;
+    document.getElementById('d-title').textContent=r.title;
+    document.getElementById('d-meta').innerHTML=`
+      ${r.cookTime?`<span class="dm">⏱ ${r.cookTime}</span>`:''}
+      ${r.servings?`<span class="dm">👥 ${r.servings}</span>`:''}
+      ${r.difficulty?`<span class="dm">◈ ${r.difficulty}</span>`:''}`;
+
+    let html=`<span class="detail-emoji">${r.emoji||'🍽️'}</span>`;
+    if(r.description) html+=`<div class="detail-desc">${r.description}</div>`;
+    if(r.tags&&r.tags.length) html+=`<div class="detail-tags">${r.tags.map(t=>`<span class="detail-tag">${t}</span>`).join('')}</div>`;
+
+    if(isPremium){
+      // Show premium gate — payment not yet set up
+      html+=`<div class="premium-gate">
+        <div class="pg-icon">⭐</div>
+        <h3>Premium Recipe</h3>
+        <p>This recipe is for NARU members. Subscriptions are coming soon — check back shortly.</p>
+        <span class="pg-btn">Unlock Recipe</span>
+        <div class="pg-note">Payment coming soon</div>
+      </div>`;
+    } else {
+      if(r.ingredients&&r.ingredients.length){
+        html+=`<div class="detail-section"><div class="ds-title">Ingredients</div>
+          <ul class="ing-list-view">${r.ingredients.map(ing=>`<li><span class="ing-qty">${ing.qty||''}</span><span>${ing.name}</span></li>`).join('')}</ul>
+        </div>`;
+      }
+      if(r.steps&&r.steps.length){
+        html+=`<div class="detail-section"><div class="ds-title">Method</div>
+          <ol class="steps-list">${r.steps.map((s,n)=>`<li><span class="step-n">${n+1}</span><span>${s}</span></li>`).join('')}</ol>
+        </div>`;
+      }
+      if(r.notes) html+=`<div class="detail-section"><div class="detail-notes"><div class="detail-notes-label">Notes</div>${r.notes}</div></div>`;
+    }
+
+    document.getElementById('d-body').innerHTML=html;
+    document.getElementById('detailOverlay').classList.add('show');
+    document.body.style.overflow='hidden';
+  }
+
+  function closeDetail(){
+    document.getElementById('detailOverlay').classList.remove('show');
+    document.body.style.overflow='';
+  }
+
+  function init(){ load(); renderFilters(); renderGrid(); }
+  init();
+</script>
+</body>
+</html>
