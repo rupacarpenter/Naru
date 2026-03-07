@@ -125,6 +125,18 @@
   .si-btn:hover{background:#8f4420;}
   @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
   @media(max-width:768px){body{overflow:auto;}.page{height:auto;}.main{grid-template-columns:1fr;}.hero{padding:2rem 1.5rem;}.pillars{grid-template-columns:1fr 1fr;}.pillar{min-height:180px;}nav{padding:1rem 1.5rem;}.fs-links{display:none;}.fg-row{grid-template-columns:1fr;}}
+
+  /* Recipe panel filters */
+  .drawer-filters{padding:0.8rem 2rem;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:0.6rem;background:var(--cream);position:sticky;top:72px;z-index:1;}
+  .filter-row{display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center;}
+  .filter-label{font-size:0.55rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--stone);width:48px;flex-shrink:0;}
+  .fpill{background:white;border:1px solid var(--border);padding:0.28rem 0.75rem;border-radius:100px;font-size:0.66rem;font-family:'Jost',sans-serif;font-weight:500;letter-spacing:0.04em;cursor:pointer;transition:all 0.2s;color:var(--stone);}
+  .fpill:hover,.fpill.active{background:var(--spice);border-color:var(--spice);color:white;}
+  .drawer-footer{padding:1.2rem 2rem;border-top:1px solid var(--border);text-align:center;}
+  .all-recipes-link{font-size:0.72rem;color:var(--spice);text-decoration:none;letter-spacing:0.1em;text-transform:uppercase;font-weight:500;}
+  .all-recipes-link:hover{opacity:0.75;}
+  .ri-tags{display:flex;gap:0.3rem;flex-wrap:wrap;margin-top:0.3rem;}
+  .ri-tag{font-size:0.56rem;background:var(--warm);border:1px solid var(--border);padding:0.1rem 0.45rem;border-radius:100px;color:var(--stone);}
 </style>
 </head>
 <body>
@@ -218,7 +230,9 @@
       <div><div class="drawer-title">Recipes</div><div class="drawer-sub">From our kitchen — updated regularly.</div></div>
       <button class="drawer-x" onclick="closePanel('recipes')">✕</button>
     </div>
+    <div class="drawer-filters" id="recipe-filters"></div>
     <div class="drawer-body" id="recipes-list"></div>
+    <div class="drawer-footer"><a href="recipes.html" class="all-recipes-link">View all recipes →</a></div>
   </div>
 </div>
 
@@ -299,22 +313,51 @@
 
   function getRecipes() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch(e) { return []; } }
 
+  let recipeFilterCat = 'all';
+  let recipeFilterTag = 'all';
+
+  function renderRecipeFilters() {
+    const recipes = getRecipes().filter(r => r.status !== 'draft');
+    const cats = [...new Set(recipes.map(r => r.category).filter(Boolean))];
+    const tags = [...new Set(recipes.flatMap(r => r.tags || []).filter(Boolean))];
+    const el = document.getElementById('recipe-filters');
+    if (!cats.length) { el.innerHTML = ''; return; }
+    let html = '<div class="filter-row"><span class="filter-label">Type</span>';
+    html += `<button class="fpill ${recipeFilterCat==='all'?'active':''}" onclick="setRecipeCat('all')">All</button>`;
+    cats.forEach(c => { html += `<button class="fpill ${recipeFilterCat===c?'active':''}" onclick="setRecipeCat('${c}')">${c}</button>`; });
+    html += '</div>';
+    if (tags.length) {
+      html += '<div class="filter-row"><span class="filter-label">Diet</span>';
+      tags.forEach(t => { html += `<button class="fpill ${recipeFilterTag===t?'active':''}" onclick="setRecipeTag('${t}')">${t}</button>`; });
+      html += '</div>';
+    }
+    el.innerHTML = html;
+  }
+
+  function setRecipeCat(cat) { recipeFilterCat = cat; renderRecipeFilters(); renderRecipes(); }
+  function setRecipeTag(tag) { recipeFilterTag = recipeFilterTag === tag ? 'all' : tag; renderRecipeFilters(); renderRecipes(); }
+
   function renderRecipes() {
-    const recipes = getRecipes();
+    let recipes = getRecipes().filter(r => r.status !== 'draft');
+    if (recipeFilterCat !== 'all') recipes = recipes.filter(r => r.category === recipeFilterCat);
+    if (recipeFilterTag !== 'all') recipes = recipes.filter(r => r.tags && r.tags.includes(recipeFilterTag));
     const el = document.getElementById('recipes-list');
     if (!recipes.length) {
-      el.innerHTML = '<div class="empty-state"><p>No recipes yet — check back soon! 🍳</p></div>';
+      el.innerHTML = '<div class="empty-state"><p>No recipes match — try a different filter.</p></div>';
       return;
     }
-    el.innerHTML = recipes.map(r => `
-      <a class="recipe-item" href="recipes.html">
+    el.innerHTML = recipes.map(r => {
+      const tagsHtml = r.tags && r.tags.length ? `<div class="ri-tags">${r.tags.map(t=>`<span class="ri-tag">${t}</span>`).join('')}</div>` : '';
+      return `<a class="recipe-item" href="recipes.html">
         <div class="ri-thumb">${r.emoji || '🍽️'}</div>
         <div>
           <div class="ri-cat">${r.category}</div>
           <div class="ri-name">${r.title}</div>
           <div class="ri-meta">⏱ ${r.cookTime} · ${r.difficulty}</div>
+          ${tagsHtml}
         </div>
-      </a>`).join('');
+      </a>`;
+    }).join('');
   }
 
   seedRecipes();
@@ -323,7 +366,7 @@
   function closeModal() { document.getElementById('overlay').classList.remove('show'); }
   document.getElementById('overlay').addEventListener('click', e => { if (e.target === document.getElementById('overlay')) closeModal(); });
 
-  function openPanel(name) { if (name === 'recipes') renderRecipes(); document.getElementById('panel-' + name).classList.add('show'); }
+  function openPanel(name) { if (name === 'recipes') { renderRecipeFilters(); renderRecipes(); } document.getElementById('panel-' + name).classList.add('show'); }
   function closePanel(name) { document.getElementById('panel-' + name).classList.remove('show'); }
   document.querySelectorAll('a[href="#"]').forEach(a => a.addEventListener('click', e => e.preventDefault()));
 </script>
