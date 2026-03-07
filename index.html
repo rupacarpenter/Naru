@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NARU — Food Made With Care</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Jost:wght@300;400;500&family=Cormorant+Garamond:ital,wght@1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream:  #FDFAF4;
+    --warm:   #F4EDE0;
+    --spice:  #B85C2C;
+    --forest: #354D3C;
+    --ink:    #1C1610;
+    --stone:  #7C7060;
+    --gold:   #C4913A;
+    --border: rgba(28,22,16,0.1);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { height:100%; }
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    overflow: hidden; /* everything fits in viewport */
+  }
+
+  /* ── LAYOUT: full-viewport grid ── */
+  .page {
+    height: 100vh;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+  }
+
+  /* ── NAV ── */
+  nav {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1.1rem 2.5rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--cream);
+  }
+
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem; font-weight: 700; letter-spacing: 0.16em;
+  }
+  .logo-line {
+    font-size: 0.52rem; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--stone); display: block; margin-top: 1px;
+  }
+
+  .nav-right { display: flex; gap: 1.8rem; align-items: center; }
+  nav a {
+    color: var(--stone); text-decoration: none;
+    font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+    font-weight: 500; transition: color 0.2s;
+  }
+  nav a:hover { color: var(--spice); }
+
+  /* ── MAIN GRID: hero left + 4 pillars right ── */
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    overflow: hidden;
+  }
+
+  /* ── HERO LEFT ── */
+  .hero {
+    background: var(--warm);
+    padding: 2.8rem 3rem;
+    display: flex; flex-direction: column; justify-content: space-between;
+    border-right: 1px solid var(--border);
+    position: relative; overflow: hidden;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute; bottom: -80px; right: -80px;
+    width: 260px; height: 260px; border-radius: 50%;
+    border: 45px solid rgba(196,145,58,0.07);
+    pointer-events: none;
+  }
+
+  .hero-top { position: relative; z-index: 1; }
+
+  .hero-kicker {
+    font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--spice); margin-bottom: 1.2rem;
+    display: flex; align-items: center; gap: 0.7rem;
+  }
+  .hero-kicker::before { content:''; width:20px; height:1px; background:var(--spice); }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 3.2vw, 3.4rem);
+    font-weight: 400; line-height: 1.12;
+    letter-spacing: -0.01em; margin-bottom: 1.2rem;
+    animation: fadeUp 0.7s ease both;
+  }
+  h1 em { font-style: italic; color: var(--spice); }
+
+  .hero-desc {
+    font-size: 0.88rem; line-height: 1.78; color: var(--stone);
+    max-width: 320px; margin-bottom: 2rem;
+    animation: fadeUp 0.7s ease 0.1s both;
+  }
+
+  .hero-actions { display: flex; gap: 0.8rem; flex-wrap: wrap; animation: fadeUp 0.7s ease 0.2s both; }
+
+  .btn-fill {
+    background: var(--spice); color: white;
+    padding: 0.75rem 1.6rem; border: none; border-radius: 2px;
+    font-family: 'Jost', sans-serif; font-size: 0.72rem;
+    font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .btn-fill:hover { background: #8f4420; }
+
+  .btn-ghost {
+    background: transparent; color: var(--ink);
+    padding: 0.75rem 1.6rem; border: 1px solid var(--border); border-radius: 2px;
+    font-family: 'Jost', sans-serif; font-size: 0.72rem;
+    font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase;
+    cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-block;
+  }
+  .btn-ghost:hover { border-color: var(--spice); color: var(--spice); }
+
+  /* Brand quote at bottom of hero */
+  .hero-bottom {
+    position: relative; z-index: 1;
+    padding-top: 1.5rem; border-top: 1px solid var(--border);
+  }
+  .hero-quote {
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-size: 1rem; color: var(--stone); line-height: 1.6;
+  }
+  .hero-quote-attr {
+    font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: rgba(28,22,16,0.3); margin-top: 0.4rem;
+  }
+
+  /* ── PILLARS RIGHT ── */
+  .pillars {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 0;
+  }
+
+  .pillar {
+    position: relative; overflow: hidden;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 2rem 2.2rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    text-decoration: none; color: inherit;
+  }
+  .pillar:nth-child(2) { border-right: none; }
+  .pillar:nth-child(3) { border-bottom: none; }
+  .pillar:nth-child(4) { border-right: none; border-bottom: none; }
+
+  /* Unique bg per pillar */
+  .pillar-recipes   { background: #F7F0E3; }
+  .pillar-watch     { background: var(--forest); }
+  .pillar-shop      { background: #F2E8D8; }
+  .pillar-book      { background: var(--ink); }
+
+  /* Hover tints */
+  .pillar-recipes:hover { background: #EFE4CA; }
+  .pillar-watch:hover   { background: #2A3D2E; }
+  .pillar-shop:hover    { background: #E8D8BE; }
+  .pillar-book:hover    { background: #0E0A06; }
+
+  /* Big background number/letter */
+  .pillar-bg-text {
+    position: absolute; top: -0.5rem; right: 0.5rem;
+    font-family: 'Playfair Display', serif; font-weight: 700;
+    font-size: 9rem; line-height: 1; user-select: none; pointer-events: none;
+    transition: transform 0.4s ease;
+  }
+  .pillar:hover .pillar-bg-text { transform: scale(1.08) translateY(-4px); }
+
+  .pillar-recipes .pillar-bg-text  { color: rgba(28,22,16,0.05); }
+  .pillar-watch   .pillar-bg-text  { color: rgba(255,255,255,0.05); }
+  .pillar-shop    .pillar-bg-text  { color: rgba(28,22,16,0.05); }
+  .pillar-book    .pillar-bg-text  { color: rgba(255,255,255,0.04); }
+
+  /* Pillar emoji */
+  .pillar-icon {
+    position: absolute; top: 1.8rem; left: 2.2rem;
+    font-size: 1.8rem;
+    transition: transform 0.3s;
+  }
+  .pillar:hover .pillar-icon { transform: scale(1.15) rotate(-5deg); }
+
+  /* Pillar content */
+  .pillar-content { position: relative; z-index: 1; }
+
+  .pillar-label {
+    font-size: 0.58rem; letter-spacing: 0.3em; text-transform: uppercase;
+    margin-bottom: 0.4rem; font-weight: 500;
+  }
+  .pillar-recipes .pillar-label,
+  .pillar-shop    .pillar-label  { color: var(--spice); }
+  .pillar-watch   .pillar-label,
+  .pillar-book    .pillar-label  { color: rgba(255,255,255,0.4); }
+
+  .pillar-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem; font-weight: 400; line-height: 1.2; margin-bottom: 0.5rem;
+  }
+  .pillar-recipes .pillar-title,
+  .pillar-shop    .pillar-title  { color: var(--ink); }
+  .pillar-watch   .pillar-title,
+  .pillar-book    .pillar-title  { color: white; }
+
+  .pillar-desc { font-size: 0.76rem; line-height: 1.6; }
+  .pillar-recipes .pillar-desc,
+  .pillar-shop    .pillar-desc  { color: var(--stone); }
+  .pillar-watch   .pillar-desc,
+  .pillar-book    .pillar-desc  { color: rgba(255,255,255,0.45); }
+
+  .pillar-arrow {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    margin-top: 0.9rem; font-size: 0.68rem; font-weight: 500;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    transition: gap 0.2s;
+  }
+  .pillar:hover .pillar-arrow { gap: 0.7rem; }
+  .pillar-recipes .pillar-arrow,
+  .pillar-shop    .pillar-arrow  { color: var(--spice); }
+  .pillar-watch   .pillar-arrow  { color: var(--gold); }
+  .pillar-book    .pillar-arrow  { color: rgba(255,255,255,0.5); }
+
+  /* ── FOOTER STRIP ── */
+  .footer-strip {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0.85rem 2.5rem;
+    border-top: 1px solid var(--border);
+    background: var(--cream);
+  }
+
+  .fs-links { display: flex; gap: 2rem; }
+  .fs-links a {
+    color: rgba(28,22,16,0.3); text-decoration: none;
+    font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .fs-links a:hover { color: var(--spice); }
+
+  .fs-copy { font-size: 0.62rem; color: rgba(28,22,16,0.22); letter-spacing: 0.06em; }
+
+  /* ── MODAL ── */
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(28,22,16,0.55); backdrop-filter: blur(10px);
+    z-index: 200; display: none; align-items: center; justify-content: center;
+  }
+  .overlay.show { display: flex; }
+
+  .modal {
+    background: var(--cream); border: 1px solid var(--border); border-radius: 4px;
+    padding: 2.5rem; max-width: 420px; width: 92%;
+    box-shadow: 0 24px 60px rgba(28,22,16,0.2);
+    animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
+    position: relative; max-height: 90vh; overflow-y: auto;
+  }
+  @keyframes popIn { from{opacity:0;transform:scale(0.95) translateY(10px)} to{opacity:1;transform:none} }
+
+  .modal-x {
+    position: absolute; top: 1rem; right: 1rem;
+    background: var(--warm); border: 1px solid var(--border);
+    width: 26px; height: 26px; border-radius: 50%; cursor: pointer;
+    color: var(--stone); display: flex; align-items: center; justify-content: center;
+    font-size: 0.65rem; transition: all 0.2s;
+  }
+  .modal-x:hover { background: #f2ddd4; color: var(--spice); }
+
+  .modal-ey { font-size: 0.58rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--spice); margin-bottom: 0.4rem; }
+  .modal h3 { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 400; margin-bottom: 0.3rem; }
+  .modal-sub { color: var(--stone); font-size: 0.8rem; margin-bottom: 1.5rem; line-height: 1.6; }
+
+  .fg { margin-bottom: 1rem; }
+  .fg label { display: block; font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--stone); margin-bottom: 0.35rem; font-weight: 500; }
+  .fg input, .fg select, .fg textarea {
+    width: 100%; background: var(--warm); border: 1px solid var(--border); color: var(--ink);
+    padding: 0.75rem 0.9rem; font-family: 'Jost', sans-serif; font-size: 0.84rem;
+    font-weight: 300; border-radius: 2px; outline: none; transition: border-color 0.2s; appearance: none;
+  }
+  .fg input:focus, .fg select:focus, .fg textarea:focus { border-color: var(--spice); background: white; }
+  .fg select option { background: white; }
+  .fg textarea { height: 80px; resize: vertical; }
+  .fg-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+
+  .modal-submit {
+    width: 100%; background: var(--spice); color: white; border: none; padding: 0.9rem;
+    font-family: 'Jost', sans-serif; font-size: 0.74rem; font-weight: 500;
+    letter-spacing: 0.18em; text-transform: uppercase; cursor: pointer; border-radius: 2px;
+    transition: background 0.2s; margin-top: 0.3rem;
+  }
+  .modal-submit:hover { background: #8f4420; }
+
+  .modal-ok {
+    background: #eaf2eb; border: 1px solid rgba(53,77,60,0.2);
+    color: var(--forest); padding: 0.9rem; text-align: center;
+    font-size: 0.78rem; border-radius: 2px; display: none; margin-top: 0.8rem; line-height: 1.6;
+  }
+  .modal-ok.show { display: block; }
+
+  /* Panel modals — recipes, watch, shop each open their own panel */
+  .panel {
+    position: fixed; inset: 0; z-index: 150;
+    display: none; align-items: stretch;
+  }
+  .panel.show { display: flex; }
+
+  .panel-backdrop {
+    flex: 1; background: rgba(28,22,16,0.4); backdrop-filter: blur(6px); cursor: pointer;
+  }
+
+  .panel-drawer {
+    width: min(520px, 92vw); background: var(--cream);
+    border-left: 1px solid var(--border); overflow-y: auto;
+    animation: slideIn 0.35s cubic-bezier(0.22,1,0.36,1) both;
+    display: flex; flex-direction: column;
+  }
+  @keyframes slideIn { from{transform:translateX(100%)} to{transform:translateX(0)} }
+
+  .drawer-head {
+    padding: 1.8rem 2rem 1.2rem; border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: flex-start;
+    position: sticky; top: 0; background: var(--cream); z-index: 1;
+  }
+  .drawer-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 400; }
+  .drawer-sub { font-size: 0.75rem; color: var(--stone); margin-top: 0.2rem; }
+  .drawer-x {
+    background: var(--warm); border: 1px solid var(--border);
+    width: 28px; height: 28px; border-radius: 50%; cursor: pointer;
+    color: var(--stone); display: flex; align-items: center; justify-content: center;
+    font-size: 0.65rem; flex-shrink: 0; margin-left: 1rem; transition: all 0.2s;
+  }
+  .drawer-x:hover { color: var(--spice); }
+
+  .drawer-body { padding: 1.5rem 2rem; flex: 1; }
+
+  /* Recipe items */
+  .recipe-item {
+    display: flex; gap: 1.2rem; padding: 1.2rem 0; border-bottom: 1px solid var(--border);
+    cursor: pointer; transition: background 0.2s; border-radius: 4px;
+  }
+  .recipe-item:last-child { border: none; }
+  .recipe-item:hover { padding-left: 0.5rem; }
+  .ri-thumb { width: 56px; height: 56px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; flex-shrink: 0; }
+  .ri-cat { font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--spice); margin-bottom: 0.2rem; }
+  .ri-name { font-family: 'Playfair Display', serif; font-size: 0.95rem; font-weight: 500; margin-bottom: 0.2rem; }
+  .ri-meta { font-size: 0.68rem; color: var(--stone); }
+
+  /* Video items */
+  .vid-item {
+    display: flex; gap: 1.2rem; padding: 1.2rem 0; border-bottom: 1px solid var(--border);
+    cursor: pointer; transition: all 0.2s;
+  }
+  .vid-item:last-child { border: none; }
+  .vi-thumb {
+    width: 80px; height: 52px; border-radius: 4px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; position: relative; overflow: hidden;
+  }
+  .vi-thumb::after { content:'▶'; position:absolute; font-size:0.7rem; color:white; background:rgba(0,0,0,0.4); width:100%; height:100%; display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity 0.2s; }
+  .vid-item:hover .vi-thumb::after { opacity:1; }
+  .vi-cat { font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.2rem; }
+  .vi-name { font-family: 'Playfair Display', serif; font-size: 0.9rem; font-weight: 400; margin-bottom: 0.2rem; }
+  .vi-meta { font-size: 0.66rem; color: var(--stone); }
+
+  /* Shop items */
+  .shop-item {
+    display: flex; gap: 1.2rem; padding: 1.2rem 0; border-bottom: 1px solid var(--border); align-items: center;
+  }
+  .shop-item:last-child { border: none; }
+  .si-thumb { width: 56px; height: 56px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; flex-shrink: 0; }
+  .si-name { font-family: 'Playfair Display', serif; font-size: 0.95rem; font-weight: 500; margin-bottom: 0.2rem; }
+  .si-desc { font-size: 0.72rem; color: var(--stone); line-height: 1.5; }
+  .si-right { margin-left: auto; text-align: right; flex-shrink: 0; }
+  .si-price { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--spice); }
+  .si-btn {
+    display: block; margin-top: 0.4rem; background: var(--spice); color: white; border: none;
+    padding: 0.35rem 0.8rem; border-radius: 2px; font-size: 0.6rem; font-family: 'Jost', sans-serif;
+    font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: background 0.2s;
+  }
+  .si-btn:hover { background: #8f4420; }
+
+  @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    body { overflow: auto; }
+    .page { height: auto; }
+    .main { grid-template-columns: 1fr; }
+    .hero { padding: 2rem 1.5rem; }
+    .pillars { grid-template-columns: 1fr 1fr; }
+    .pillar { min-height: 180px; }
+    nav { padding: 1rem 1.5rem; }
+    .fs-links { display: none; }
+    .fg-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- NAV -->
+  <nav>
+    <div>
+      <span class="logo">NARU</span>
+      <span class="logo-line">Food Made With Care</span>
+    </div>
+    <div class="nav-right">
+      <a href="#" onclick="openPanel('recipes'); return false;">Recipes</a>
+      <a href="#" onclick="openPanel('watch'); return false;">Watch</a>
+      <a href="#" onclick="openPanel('shop'); return false;">Shop</a>
+      <button class="btn-fill" onclick="openModal()" style="font-size:0.68rem; padding:0.6rem 1.2rem">Book a Dinner</button>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- HERO LEFT -->
+    <div class="hero">
+      <div class="hero-top">
+        <div class="hero-kicker">Food · Craft · Care</div>
+        <h1>Slow food.<br><em>Real flavour.</em><br>No shortcuts.</h1>
+        <p class="hero-desc">NARU is a small food brand — recipes, cooking videos, handmade products, and private dining for people who take food seriously.</p>
+        <div class="hero-actions">
+          <button class="btn-fill" onclick="openModal()">Book a Private Dinner</button>
+          <a href="#" class="btn-ghost" onclick="openPanel('shop'); return false;">Shop NARU</a>
+        </div>
+      </div>
+      <div class="hero-bottom">
+        <div class="hero-quote">"The best food comes from patience, good ingredients, and genuine care."</div>
+        <div class="hero-quote-attr">— NARU</div>
+      </div>
+    </div>
+
+    <!-- 4 PILLARS -->
+    <div class="pillars">
+
+      <a href="#" class="pillar pillar-recipes" onclick="openPanel('recipes'); return false;">
+        <span class="pillar-bg-text">R</span>
+        <span class="pillar-icon">🍞</span>
+        <div class="pillar-content">
+          <div class="pillar-label">Explore</div>
+          <div class="pillar-title">Recipes</div>
+          <div class="pillar-desc">Step-by-step guides from our kitchen — bread, ferments, mains, and more.</div>
+          <div class="pillar-arrow">Browse recipes →</div>
+        </div>
+      </a>
+
+      <a href="#" class="pillar pillar-watch" onclick="openPanel('watch'); return false;">
+        <span class="pillar-bg-text">W</span>
+        <span class="pillar-icon">🎬</span>
+        <div class="pillar-content">
+          <div class="pillar-label">Watch</div>
+          <div class="pillar-title">Cooking Videos</div>
+          <div class="pillar-desc">Short clips and longer guides — techniques, recipes, and real kitchen moments.</div>
+          <div class="pillar-arrow">Watch now →</div>
+        </div>
+      </a>
+
+      <a href="#" class="pillar pillar-shop" onclick="openPanel('shop'); return false;">
+        <span class="pillar-bg-text">S</span>
+        <span class="pillar-icon">🫙</span>
+        <div class="pillar-content">
+          <div class="pillar-label">Made to Order</div>
+          <div class="pillar-title">Shop</div>
+          <div class="pillar-desc">Sourdough, pickles, chilli oil and more — made by hand in small batches.</div>
+          <div class="pillar-arrow">Shop now →</div>
+        </div>
+      </a>
+
+      <a href="#" class="pillar pillar-book" onclick="openModal(); return false;">
+        <span class="pillar-bg-text">B</span>
+        <span class="pillar-icon">🍽️</span>
+        <div class="pillar-content">
+          <div class="pillar-label">Private Chef</div>
+          <div class="pillar-title">Book a Dinner</div>
+          <div class="pillar-desc">We come to you — bespoke menus, dinner parties, and supper clubs. From £65pp.</div>
+          <div class="pillar-arrow">Make an enquiry →</div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- FOOTER STRIP -->
+  <div class="footer-strip">
+    <div class="fs-links">
+      <a href="#">About</a>
+      <a href="#">Instagram</a>
+      <a href="#">Newsletter</a>
+      <a href="#">Contact</a>
+    </div>
+    <div class="fs-copy">© 2026 NARU · Made slowly, with care.</div>
+  </div>
+
+</div>
+
+<!-- PANEL: RECIPES -->
+<div class="panel" id="panel-recipes">
+  <div class="panel-backdrop" onclick="closePanel('recipes')"></div>
+  <div class="panel-drawer">
+    <div class="drawer-head">
+      <div>
+        <div class="drawer-title">Recipes</div>
+        <div class="drawer-sub">From our kitchen — updated regularly.</div>
+      </div>
+      <button class="drawer-x" onclick="closePanel('recipes')">✕</button>
+    </div>
+    <div class="drawer-body">
+      <div class="recipe-item">
+        <div class="ri-thumb" style="background:#F7F0E3">🍞</div>
+        <div>
+          <div class="ri-cat">Bread & Baking</div>
+          <div class="ri-name">72-Hour Country Sourdough</div>
+          <div class="ri-meta">⏱ 72 hrs · Intermediate</div>
+        </div>
+      </div>
+      <div class="recipe-item">
+        <div class="ri-thumb" style="background:#E8EFE9">🥒</div>
+        <div>
+          <div class="ri-cat">Fermentation</div>
+          <div class="ri-name">Quick Pickled Cucumbers</div>
+          <div class="ri-meta">⏱ 30 min · Easy</div>
+        </div>
+      </div>
+      <div class="recipe-item">
+        <div class="ri-thumb" style="background:#F9EDE5">🍲</div>
+        <div>
+          <div class="ri-cat">Mains</div>
+          <div class="ri-name">Slow Lamb, Warm Spice</div>
+          <div class="ri-meta">⏱ 4 hrs · Easy</div>
+        </div>
+      </div>
+      <div class="recipe-item">
+        <div class="ri-thumb" style="background:#FBF3E4">🌶️</div>
+        <div>
+          <div class="ri-cat">Condiments</div>
+          <div class="ri-name">Slow-Infused Chilli Oil</div>
+          <div class="ri-meta">⏱ 1 hr · Easy</div>
+        </div>
+      </div>
+      <div class="recipe-item">
+        <div class="ri-thumb" style="background:#EDE3D0">🥚</div>
+        <div>
+          <div class="ri-cat">Breakfast</div>
+          <div class="ri-name">Soft Scrambled Eggs on Toast</div>
+          <div class="ri-meta">⏱ 10 min · Easy</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PANEL: WATCH -->
+<div class="panel" id="panel-watch">
+  <div class="panel-backdrop" onclick="closePanel('watch')"></div>
+  <div class="panel-drawer">
+    <div class="drawer-head">
+      <div>
+        <div class="drawer-title">Watch</div>
+        <div class="drawer-sub">From our kitchen to yours.</div>
+      </div>
+      <button class="drawer-x" onclick="closePanel('watch')">✕</button>
+    </div>
+    <div class="drawer-body">
+      <div class="vid-item">
+        <div class="vi-thumb" style="background:linear-gradient(135deg,#354D3C,#243529)">🍞</div>
+        <div>
+          <div class="vi-cat">Bread</div>
+          <div class="vi-name">Scoring & Loading Your Sourdough</div>
+          <div class="vi-meta">8 min · Technique</div>
+        </div>
+      </div>
+      <div class="vid-item">
+        <div class="vi-thumb" style="background:linear-gradient(135deg,#B85C2C,#7A3A18)">🫙</div>
+        <div>
+          <div class="vi-cat">Fermentation</div>
+          <div class="vi-name">Why We Ferment Everything</div>
+          <div class="vi-meta">12 min · Philosophy</div>
+        </div>
+      </div>
+      <div class="vid-item">
+        <div class="vi-thumb" style="background:linear-gradient(135deg,#4A3728,#2E2018)">🔪</div>
+        <div>
+          <div class="vi-cat">Technique</div>
+          <div class="vi-name">Knife Skills That Actually Matter</div>
+          <div class="vi-meta">6 min · Basics</div>
+        </div>
+      </div>
+      <div class="vid-item">
+        <div class="vi-thumb" style="background:linear-gradient(135deg,#C4913A,#9A6E22)">🌿</div>
+        <div>
+          <div class="vi-cat">Seasonal</div>
+          <div class="vi-name">Cooking with What's in Season</div>
+          <div class="vi-meta">15 min · Ideas</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PANEL: SHOP -->
+<div class="panel" id="panel-shop">
+  <div class="panel-backdrop" onclick="closePanel('shop')"></div>
+  <div class="panel-drawer">
+    <div class="drawer-head">
+      <div>
+        <div class="drawer-title">Shop</div>
+        <div class="drawer-sub">Made by hand, in small batches, to order.</div>
+      </div>
+      <button class="drawer-x" onclick="closePanel('shop')">✕</button>
+    </div>
+    <div class="drawer-body">
+      <div class="shop-item">
+        <div class="si-thumb" style="background:#F7F0E3">🍞</div>
+        <div>
+          <div class="si-name">Country Sourdough</div>
+          <div class="si-desc">1kg naturally leavened loaf. 48hrs notice needed.</div>
+        </div>
+        <div class="si-right">
+          <div class="si-price">£9</div>
+          <button class="si-btn" onclick="openModal()">Order</button>
+        </div>
+      </div>
+      <div class="shop-item">
+        <div class="si-thumb" style="background:#E8EFE9">🫙</div>
+        <div>
+          <div class="si-name">House Pickles</div>
+          <div class="si-desc">Seasonal veg, fermented in-house. 340g jar.</div>
+        </div>
+        <div class="si-right">
+          <div class="si-price">£6</div>
+          <button class="si-btn" onclick="openModal()">Order</button>
+        </div>
+      </div>
+      <div class="shop-item">
+        <div class="si-thumb" style="background:#F9EDE5">🌶️</div>
+        <div>
+          <div class="si-name">Chilli Oil</div>
+          <div class="si-desc">Slow-infused with toasted spices. Goes on everything.</div>
+        </div>
+        <div class="si-right">
+          <div class="si-price">£7</div>
+          <button class="si-btn" onclick="openModal()">Order</button>
+        </div>
+      </div>
+      <div class="shop-item">
+        <div class="si-thumb" style="background:#EDE3D0">🍯</div>
+        <div>
+          <div class="si-name">Sourdough Starter</div>
+          <div class="si-desc">A piece of our 3-year-old starter, ready to bake.</div>
+        </div>
+        <div class="si-right">
+          <div class="si-price">£4</div>
+          <button class="si-btn" onclick="openModal()">Order</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BOOKING MODAL -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <button class="modal-x" onclick="closeModal()">✕</button>
+    <div class="modal-ey">Get in touch</div>
+    <h3>Book or Order</h3>
+    <p class="modal-sub">Drop us a message and we'll be in touch within 48 hours.</p>
+    <div class="fg"><label>Your Name</label><input type="text" placeholder="First and last name"></div>
+    <div class="fg"><label>Email</label><input type="email" placeholder="you@example.com"></div>
+    <div class="fg"><label>What are you interested in?</label>
+      <select><option>Private Dinner</option><option>Sourdough Order</option><option>Pickles / Chilli Oil</option><option>Sourdough Starter</option><option>Something else</option></select>
+    </div>
+    <div class="fg-row">
+      <div class="fg"><label>Date (if relevant)</label><input type="date"></div>
+      <div class="fg"><label>Guests</label><input type="number" placeholder="e.g. 8"></div>
+    </div>
+    <div class="fg"><label>Message</label><textarea placeholder="Anything helpful — dietary needs, ideas, questions..."></textarea></div>
+    <button class="modal-submit" onclick="document.getElementById('modalOk').classList.add('show')">Send Message</button>
+    <div class="modal-ok" id="modalOk">Message received — we'll be in touch very soon. Thank you! 🙏</div>
+  </div>
+</div>
+
+<script>
+  function openModal() {
+    document.getElementById('overlay').classList.add('show');
+    document.getElementById('modalOk').classList.remove('show');
+  }
+  function closeModal() { document.getElementById('overlay').classList.remove('show'); }
+  document.getElementById('overlay').addEventListener('click', e => {
+    if (e.target === document.getElementById('overlay')) closeModal();
+  });
+
+  function openPanel(name) {
+    document.getElementById('panel-' + name).classList.add('show');
+  }
+  function closePanel(name) {
+    document.getElementById('panel-' + name).classList.remove('show');
+  }
+
+  document.querySelectorAll('a[href="#"]').forEach(a => a.addEventListener('click', e => e.preventDefault()));
+</script>
+</body>
+</html>
