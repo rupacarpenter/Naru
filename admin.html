@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — NARU</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --parchment: #F7F2EA;
+    --warm-white: #FDFAF5;
+    --terracotta: #C1603A;
+    --forest: #3B5E45;
+    --forest-light: #E8EFE9;
+    --ink: #1A1610;
+    --ink-soft: #3D352A;
+    --stone: #7A6E62;
+    --stone-light: #C4BCB2;
+    --blush: #F2E4D8;
+    --gold: #B8975A;
+    --gold-pale: #F5EDD9;
+    --border: rgba(26,22,16,0.12);
+    --error: #C1603A;
+    --success: #3B5E45;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--warm-white); color: var(--ink);
+    font-family: 'Jost', sans-serif; font-weight: 300;
+  }
+
+  /* LOGIN SCREEN */
+  .login-screen {
+    min-height: 100vh; display: flex;
+    align-items: center; justify-content: center;
+    background: var(--parchment);
+  }
+  .login-box {
+    background: var(--warm-white); padding: 3rem;
+    border: 1px solid var(--border); border-radius: 4px;
+    width: 100%; max-width: 420px; text-align: center;
+  }
+  .login-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem; font-weight: 700; letter-spacing: 0.12em;
+    color: var(--ink); margin-bottom: 0.3rem;
+  }
+  .login-sub {
+    font-size: 0.68rem; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--stone); margin-bottom: 2.5rem;
+  }
+  .login-box h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem; font-weight: 400; margin-bottom: 0.5rem;
+  }
+  .login-box p { font-size: 0.85rem; color: var(--stone); margin-bottom: 2rem; }
+  .form-group { text-align: left; margin-bottom: 1.2rem; }
+  .form-group label {
+    display: block; font-size: 0.68rem; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--stone); margin-bottom: 0.5rem;
+  }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%; padding: 0.8rem 1rem;
+    border: 1px solid var(--border); background: var(--warm-white);
+    font-family: 'Jost', sans-serif; font-size: 0.9rem; font-weight: 300;
+    color: var(--ink); border-radius: 2px;
+    transition: border-color 0.2s; outline: none;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    border-color: var(--terracotta);
+  }
+  .error-msg {
+    color: var(--error); font-size: 0.8rem; margin-top: 0.5rem; display: none;
+  }
+  .btn-primary {
+    width: 100%; padding: 0.9rem; background: var(--terracotta);
+    color: white; border: none; cursor: pointer;
+    font-family: 'Jost', sans-serif; font-size: 0.78rem;
+    font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase;
+    border-radius: 2px; transition: background 0.25s; margin-top: 0.5rem;
+  }
+  .btn-primary:hover { background: var(--ink); }
+  .btn-secondary {
+    padding: 0.7rem 1.5rem; background: transparent;
+    color: var(--stone); border: 1px solid var(--border); cursor: pointer;
+    font-family: 'Jost', sans-serif; font-size: 0.72rem;
+    font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase;
+    border-radius: 2px; transition: all 0.2s;
+  }
+  .btn-secondary:hover { border-color: var(--ink); color: var(--ink); }
+
+  /* ADMIN LAYOUT */
+  .admin-wrap { display: none; min-height: 100vh; }
+  .admin-wrap.visible { display: flex; }
+
+  .admin-sidebar {
+    width: 260px; min-height: 100vh; flex-shrink: 0;
+    background: var(--ink); padding: 2rem;
+    display: flex; flex-direction: column;
+  }
+  .sidebar-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem; font-weight: 700; letter-spacing: 0.12em;
+    color: white; margin-bottom: 0.3rem;
+  }
+  .sidebar-sub {
+    font-size: 0.6rem; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--stone-light); margin-bottom: 2.5rem;
+  }
+  .sidebar-nav { list-style: none; }
+  .sidebar-nav li { margin-bottom: 0.3rem; }
+  .sidebar-nav a, .sidebar-nav button {
+    display: block; width: 100%; text-align: left;
+    padding: 0.7rem 1rem; color: var(--stone-light);
+    font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase;
+    text-decoration: none; background: none; border: none; cursor: pointer;
+    font-family: 'Jost', sans-serif; font-weight: 500;
+    border-radius: 2px; transition: all 0.2s;
+  }
+  .sidebar-nav a:hover, .sidebar-nav button:hover,
+  .sidebar-nav a.active, .sidebar-nav button.active {
+    background: rgba(255,255,255,0.08); color: white;
+  }
+  .sidebar-footer {
+    margin-top: auto; padding-top: 2rem;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .sidebar-footer a {
+    display: block; font-size: 0.72rem; color: var(--stone-light);
+    text-decoration: none; margin-bottom: 0.5rem; letter-spacing: 0.1em;
+  }
+  .sidebar-footer a:hover { color: white; }
+  .logout-btn {
+    background: none; border: 1px solid rgba(255,255,255,0.15);
+    color: var(--stone-light); cursor: pointer;
+    font-family: 'Jost', sans-serif; font-size: 0.7rem;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    padding: 0.6rem 1rem; border-radius: 2px; margin-top: 0.8rem;
+    transition: all 0.2s; width: 100%;
+  }
+  .logout-btn:hover { border-color: white; color: white; }
+
+  .admin-main {
+    flex: 1; padding: 3rem; overflow-y: auto;
+    max-width: 900px;
+  }
+
+  .admin-header {
+    margin-bottom: 2.5rem; padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .admin-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem; font-weight: 400; margin-bottom: 0.3rem;
+  }
+  .admin-header p { color: var(--stone); font-size: 0.88rem; }
+
+  /* TABS */
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* RECIPE FORM */
+  .form-card {
+    background: white; border: 1px solid var(--border);
+    border-radius: 4px; padding: 2rem; margin-bottom: 2rem;
+  }
+  .form-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem; font-weight: 400; margin-bottom: 1.5rem;
+    padding-bottom: 0.8rem; border-bottom: 1px solid var(--border);
+  }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+  .form-group textarea {
+    resize: vertical; min-height: 80px; line-height: 1.6;
+  }
+  .form-group textarea.tall { min-height: 160px; }
+  .form-group select { cursor: pointer; }
+
+  /* Dynamic lists */
+  .dynamic-list { margin-bottom: 0.5rem; }
+  .dynamic-item {
+    display: flex; gap: 0.5rem; margin-bottom: 0.5rem; align-items: center;
+  }
+  .dynamic-item input {
+    flex: 1; padding: 0.65rem 0.9rem;
+    border: 1px solid var(--border); background: var(--warm-white);
+    font-family: 'Jost', sans-serif; font-size: 0.88rem;
+    color: var(--ink); border-radius: 2px; outline: none;
+  }
+  .dynamic-item input:focus { border-color: var(--terracotta); }
+  .remove-btn {
+    width: 32px; height: 32px; border-radius: 50%;
+    border: 1px solid var(--border); background: none;
+    cursor: pointer; color: var(--stone); font-size: 1rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; flex-shrink: 0;
+  }
+  .remove-btn:hover { background: var(--error); border-color: var(--error); color: white; }
+  .add-item-btn {
+    background: none; border: 1px dashed var(--stone-light);
+    color: var(--stone); cursor: pointer; padding: 0.55rem 1rem;
+    font-family: 'Jost', sans-serif; font-size: 0.72rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    border-radius: 2px; transition: all 0.2s; margin-top: 0.3rem;
+  }
+  .add-item-btn:hover { border-color: var(--terracotta); color: var(--terracotta); }
+
+  /* TYPE TOGGLE */
+  .type-toggle { display: flex; gap: 0; border: 1px solid var(--border); border-radius: 2px; overflow: hidden; }
+  .type-option { flex: 1; }
+  .type-option input { display: none; }
+  .type-option label {
+    display: block; text-align: center; padding: 0.7rem;
+    font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase;
+    cursor: pointer; transition: all 0.2s; color: var(--stone);
+    font-family: 'Jost', sans-serif; font-weight: 500;
+  }
+  .type-option input:checked + label {
+    background: var(--terracotta); color: white;
+  }
+  .type-option:last-child input:checked + label {
+    background: var(--gold);
+  }
+
+  /* RECIPE LIST */
+  .recipe-list-item {
+    background: white; border: 1px solid var(--border);
+    border-radius: 4px; padding: 1.2rem 1.5rem; margin-bottom: 0.8rem;
+    display: flex; align-items: center; gap: 1.2rem;
+  }
+  .recipe-emoji { font-size: 1.8rem; flex-shrink: 0; }
+  .recipe-info { flex: 1; }
+  .recipe-info h4 {
+    font-family: 'Playfair Display', serif; font-size: 1rem; margin-bottom: 0.2rem;
+  }
+  .recipe-info p { font-size: 0.78rem; color: var(--stone); }
+  .recipe-badges { display: flex; gap: 0.5rem; flex-shrink: 0; }
+  .badge {
+    font-size: 0.62rem; letter-spacing: 0.15em; text-transform: uppercase;
+    padding: 0.25rem 0.6rem; border-radius: 2px; font-weight: 500;
+  }
+  .badge-free { background: var(--forest-light); color: var(--forest); }
+  .badge-premium { background: var(--gold-pale); color: var(--gold); }
+  .badge-easy { background: var(--forest-light); color: var(--forest); }
+  .badge-medium { background: var(--gold-pale); color: var(--gold); }
+  .badge-hard { background: #FAE8E0; color: var(--terracotta); }
+  .recipe-actions { display: flex; gap: 0.5rem; flex-shrink: 0; }
+  .edit-btn, .delete-btn {
+    padding: 0.45rem 0.9rem;
+    font-family: 'Jost', sans-serif; font-size: 0.68rem;
+    letter-spacing: 0.1em; text-transform: uppercase; font-weight: 500;
+    border-radius: 2px; cursor: pointer; transition: all 0.2s;
+  }
+  .edit-btn { background: none; border: 1px solid var(--border); color: var(--stone); }
+  .edit-btn:hover { border-color: var(--ink); color: var(--ink); }
+  .delete-btn { background: none; border: 1px solid transparent; color: var(--stone); }
+  .delete-btn:hover { border-color: var(--error); color: var(--error); }
+
+  /* TOAST */
+  .toast {
+    position: fixed; bottom: 2rem; right: 2rem; z-index: 999;
+    background: var(--ink); color: white;
+    padding: 1rem 1.5rem; border-radius: 4px;
+    font-size: 0.82rem; letter-spacing: 0.05em;
+    transform: translateY(80px); opacity: 0;
+    transition: all 0.35s; pointer-events: none;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { background: var(--forest); }
+  .toast.error { background: var(--error); }
+
+  /* CODE BOX */
+  .code-box {
+    background: var(--ink); color: #E8C97A;
+    padding: 1.5rem; border-radius: 4px;
+    font-family: monospace; font-size: 0.82rem; line-height: 1.8;
+    overflow-x: auto; white-space: pre; margin-bottom: 1rem;
+    max-height: 60vh; overflow-y: auto;
+  }
+  .copy-btn {
+    background: var(--terracotta); color: white; border: none;
+    padding: 0.65rem 1.5rem; cursor: pointer;
+    font-family: 'Jost', sans-serif; font-size: 0.75rem;
+    font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase;
+    border-radius: 2px; transition: background 0.2s;
+  }
+  .copy-btn:hover { background: var(--gold); }
+  .instructions {
+    background: var(--blush); border: 1px solid rgba(193,96,58,0.2);
+    border-radius: 4px; padding: 1.2rem 1.5rem; margin-bottom: 1.5rem;
+    font-size: 0.85rem; line-height: 1.8; color: var(--ink-soft);
+  }
+  .instructions strong { color: var(--terracotta); }
+
+  @media (max-width: 768px) {
+    .admin-sidebar { display: none; }
+    .admin-main { padding: 1.5rem; }
+    .form-row, .form-row-3 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-screen" id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">NARU</div>
+    <div class="login-sub">Admin Portal</div>
+    <h2>Welcome back</h2>
+    <p>Enter your password to manage the site</p>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="password-input" placeholder="Enter admin password"
+        onkeydown="if(event.key==='Enter') login()">
+      <div class="error-msg" id="login-error">Incorrect password. Try again.</div>
+    </div>
+    <button class="btn-primary" onclick="login()">Enter Admin</button>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div class="admin-wrap" id="admin-wrap">
+  <!-- SIDEBAR -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-logo">NARU</div>
+    <div class="sidebar-sub">Admin Portal</div>
+    <ul class="sidebar-nav">
+      <li><button onclick="showTab('recipes')" id="tab-recipes" class="active">📋 All Recipes</button></li>
+      <li><button onclick="showTab('add')" id="tab-add">✦ Add Recipe</button></li>
+      <li><button onclick="showTab('export')" id="tab-export">↗ Export to Site</button></li>
+    </ul>
+    <div class="sidebar-footer">
+      <a href="recipes.html" target="_blank">→ View Recipes Page</a>
+      <a href="index.html" target="_blank">→ View Main Site</a>
+      <button class="logout-btn" onclick="logout()">Log Out</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="admin-main">
+
+    <!-- ALL RECIPES TAB -->
+    <div class="tab-content active" id="content-recipes">
+      <div class="admin-header">
+        <h1>All Recipes</h1>
+        <p>Manage your recipe collection. Changes here update the export code.</p>
+      </div>
+      <div id="recipe-list-container"></div>
+    </div>
+
+    <!-- ADD RECIPE TAB -->
+    <div class="tab-content" id="content-add">
+      <div class="admin-header">
+        <h1 id="form-heading">Add a Recipe</h1>
+        <p>Fill in the details below. All fields marked with * are required.</p>
+      </div>
+
+      <div class="form-card">
+        <h3>Basic Details</h3>
+        <div class="form-group">
+          <label>Recipe Title *</label>
+          <input type="text" id="f-title" placeholder="e.g. Lamb Shoulder with Pomegranate & Sumac">
+        </div>
+        <div class="form-group">
+          <label>Short Description *</label>
+          <textarea id="f-desc" placeholder="A 1–2 sentence description that appears on the recipe card..."></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Chef Name *</label>
+            <input type="text" id="f-chef" value="Nayan" placeholder="Chef name">
+          </div>
+          <div class="form-group">
+            <label>Emoji (shown if no photo)</label>
+            <input type="text" id="f-emoji" placeholder="🍽" maxlength="4">
+          </div>
+        </div>
+        <div class="form-row-3">
+          <div class="form-group">
+            <label>Cook Time *</label>
+            <input type="text" id="f-time" placeholder="e.g. 45 mins, 4 hrs">
+          </div>
+          <div class="form-group">
+            <label>Servings *</label>
+            <input type="text" id="f-servings" placeholder="e.g. 4, 4–6">
+          </div>
+          <div class="form-group">
+            <label>Difficulty *</label>
+            <select id="f-difficulty">
+              <option value="easy">Easy</option>
+              <option value="medium" selected>Medium</option>
+              <option value="hard">Advanced</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Recipe Type *</label>
+          <div class="type-toggle">
+            <div class="type-option">
+              <input type="radio" name="type" id="type-free" value="free" checked>
+              <label for="type-free">Free Recipe</label>
+            </div>
+            <div class="type-option">
+              <input type="radio" name="type" id="type-premium" value="premium">
+              <label for="type-premium">✦ Premium</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <h3>Media</h3>
+        <div class="form-group">
+          <label>Photo URL (optional)</label>
+          <input type="text" id="f-image" placeholder="Paste an image URL, e.g. https://images.unsplash.com/...">
+          <div style="font-size:0.75rem;color:var(--stone);margin-top:0.4rem;">
+            Tip: Upload your photo to <a href="https://imgur.com" target="_blank" style="color:var(--terracotta)">imgur.com</a> and paste the link here. Or leave blank to show the emoji.
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Video URL (optional)</label>
+          <input type="text" id="f-video" placeholder="YouTube embed URL, e.g. https://www.youtube.com/embed/...">
+          <div style="font-size:0.75rem;color:var(--stone);margin-top:0.4rem;">
+            On YouTube: click Share → Embed → copy the src URL only
+          </div>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <h3>Ingredients *</h3>
+        <div class="dynamic-list" id="ingredients-list"></div>
+        <button class="add-item-btn" onclick="addIngredient()">+ Add Ingredient</button>
+      </div>
+
+      <div class="form-card">
+        <h3>Method — Step by Step *</h3>
+        <div class="dynamic-list" id="steps-list"></div>
+        <button class="add-item-btn" onclick="addStep()">+ Add Step</button>
+      </div>
+
+      <div style="display:flex;gap:1rem;margin-top:1rem;">
+        <button class="btn-primary" style="max-width:220px;" onclick="saveRecipe()">Save Recipe</button>
+        <button class="btn-secondary" onclick="resetForm()">Clear Form</button>
+      </div>
+      <input type="hidden" id="edit-id" value="">
+    </div>
+
+    <!-- EXPORT TAB -->
+    <div class="tab-content" id="content-export">
+      <div class="admin-header">
+        <h1>Export to Site</h1>
+        <p>Copy the code below and paste it into your <strong>recipes.html</strong> file on GitHub.</p>
+      </div>
+      <div class="instructions">
+        <strong>How to update your live site:</strong><br>
+        1. Click <strong>"Generate Export Code"</strong> below<br>
+        2. Click <strong>"Copy Code"</strong><br>
+        3. Go to your <strong>GitHub repository</strong> → open <strong>recipes.html</strong><br>
+        4. Find the line that says <code>let recipes = [</code><br>
+        5. Select from that line to the closing <code>];</code> and replace it with the copied code<br>
+        6. Click <strong>"Commit changes"</strong> — your site updates automatically ✓
+      </div>
+      <button class="btn-primary" style="margin-bottom:1rem;max-width:240px;" onclick="generateExport()">Generate Export Code</button>
+      <div id="export-output" style="display:none;">
+        <div class="code-box" id="export-code"></div>
+        <button class="copy-btn" onclick="copyExport()">Copy Code</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// =============================================
+// PASSWORD — change this to whatever you want!
+// =============================================
+const ADMIN_PASSWORD = 'naru2025';
+
+// =============================================
+// LOCAL STORAGE — recipes persist in browser
+// =============================================
+let recipes = JSON.parse(localStorage.getItem('naru_recipes') || 'null') || [
+  {
+    id: 1,
+    title: "Lamb Shoulder with Pomegranate & Sumac",
+    description: "Slow-roasted until falling apart, finished with a sticky pomegranate glaze and a shower of sumac.",
+    chef: "Nayan", type: "free", difficulty: "medium",
+    cookTime: "4 hrs", servings: "4–6", image: "", emoji: "🥩", videoUrl: "",
+    ingredients: ["1 whole lamb shoulder (approx 2kg)", "3 tbsp pomegranate molasses", "2 tsp sumac", "4 garlic cloves, crushed", "2 tbsp olive oil", "Salt and black pepper"],
+    steps: ["Score the lamb shoulder all over and rub with spice mixture.", "Marinate overnight in the fridge.", "Roast at 160°C covered for 3.5 hours, then uncovered at 200°C for 30 mins.", "Rest and pull apart. Serve with pomegranate seeds and flatbreads."]
+  },
+  {
+    id: 2,
+    title: "Brown Butter Miso Cookies",
+    description: "Crisp edges, chewy centres, and a depth of flavour that'll have people asking what your secret is.",
+    chef: "Nayan", type: "free", difficulty: "easy",
+    cookTime: "25 mins", servings: "18 cookies", image: "", emoji: "🍪", videoUrl: "",
+    ingredients: ["225g unsalted butter", "2 tbsp white miso paste", "200g light brown sugar", "2 eggs", "300g plain flour", "200g dark chocolate, chopped"],
+    steps: ["Brown the butter until nutty and golden.", "Whisk in miso, then beat with sugars and eggs.", "Fold in flour and chocolate. Chill 30 mins.", "Bake at 180°C for 11–13 mins. Sprinkle with flaky salt."]
+  }
+];
+
+function saveRecipes() {
+  localStorage.setItem('naru_recipes', JSON.stringify(recipes));
+}
+
+// =============================================
+// AUTH
+// =============================================
+function login() {
+  const pw = document.getElementById('password-input').value;
+  if (pw === ADMIN_PASSWORD) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('admin-wrap').classList.add('visible');
+    renderRecipeList();
+    initForm();
+  } else {
+    document.getElementById('login-error').style.display = 'block';
+    document.getElementById('password-input').value = '';
+  }
+}
+
+function logout() {
+  document.getElementById('admin-wrap').classList.remove('visible');
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('password-input').value = '';
+}
+
+// =============================================
+// TABS
+// =============================================
+function showTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.sidebar-nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('content-' + tab).classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+  if (tab === 'recipes') renderRecipeList();
+}
+
+// =============================================
+// RECIPE LIST
+// =============================================
+function renderRecipeList() {
+  const container = document.getElementById('recipe-list-container');
+  if (recipes.length === 0) {
+    container.innerHTML = '<p style="color:var(--stone);font-size:0.9rem;padding:2rem 0;">No recipes yet. Click <strong>Add Recipe</strong> to get started.</p>';
+    return;
+  }
+  container.innerHTML = recipes.map(r => `
+    <div class="recipe-list-item">
+      <div class="recipe-emoji">${r.emoji || '🍽'}</div>
+      <div class="recipe-info">
+        <h4>${r.title}</h4>
+        <p>By ${r.chef} · ${r.cookTime} · Serves ${r.servings}</p>
+      </div>
+      <div class="recipe-badges">
+        <span class="badge badge-${r.type}">${r.type === 'premium' ? '✦ Premium' : 'Free'}</span>
+        <span class="badge badge-${r.difficulty}">${r.difficulty}</span>
+      </div>
+      <div class="recipe-actions">
+        <button class="edit-btn" onclick="editRecipe(${r.id})">Edit</button>
+        <button class="delete-btn" onclick="deleteRecipe(${r.id})">Delete</button>
+      </div>
+    </div>`).join('');
+}
+
+// =============================================
+// DYNAMIC FORM
+// =============================================
+function initForm() {
+  if (document.getElementById('ingredients-list').children.length === 0) {
+    for (let i = 0; i < 4; i++) addIngredient();
+    for (let i = 0; i < 3; i++) addStep();
+  }
+}
+
+function addIngredient(value='') {
+  const list = document.getElementById('ingredients-list');
+  const div = document.createElement('div');
+  div.className = 'dynamic-item';
+  div.innerHTML = `<input type="text" placeholder="e.g. 200g plain flour" value="${value}">
+    <button class="remove-btn" onclick="this.parentNode.remove()">×</button>`;
+  list.appendChild(div);
+}
+
+function addStep(value='') {
+  const list = document.getElementById('steps-list');
+  const num = list.children.length + 1;
+  const div = document.createElement('div');
+  div.className = 'dynamic-item';
+  div.innerHTML = `<input type="text" placeholder="Step ${num}..." value="${escapeAttr(value)}">
+    <button class="remove-btn" onclick="this.parentNode.remove()">×</button>`;
+  list.appendChild(div);
+}
+
+function escapeAttr(str) {
+  return str.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function resetForm() {
+  ['f-title','f-desc','f-chef','f-emoji','f-time','f-servings','f-image','f-video','edit-id'].forEach(id => {
+    document.getElementById(id).value = id === 'f-chef' ? 'Nayan' : '';
+  });
+  document.getElementById('f-difficulty').value = 'medium';
+  document.getElementById('type-free').checked = true;
+  document.getElementById('ingredients-list').innerHTML = '';
+  document.getElementById('steps-list').innerHTML = '';
+  for (let i = 0; i < 4; i++) addIngredient();
+  for (let i = 0; i < 3; i++) addStep();
+  document.getElementById('form-heading').textContent = 'Add a Recipe';
+}
+
+function editRecipe(id) {
+  const r = recipes.find(x => x.id === id);
+  if (!r) return;
+  showTab('add');
+  document.getElementById('form-heading').textContent = 'Edit Recipe';
+  document.getElementById('edit-id').value = id;
+  document.getElementById('f-title').value = r.title;
+  document.getElementById('f-desc').value = r.description;
+  document.getElementById('f-chef').value = r.chef;
+  document.getElementById('f-emoji').value = r.emoji || '';
+  document.getElementById('f-time').value = r.cookTime;
+  document.getElementById('f-servings').value = r.servings;
+  document.getElementById('f-difficulty').value = r.difficulty;
+  document.getElementById('f-image').value = r.image || '';
+  document.getElementById('f-video').value = r.videoUrl || '';
+  document.querySelector(`input[name="type"][value="${r.type}"]`).checked = true;
+  document.getElementById('ingredients-list').innerHTML = '';
+  document.getElementById('steps-list').innerHTML = '';
+  r.ingredients.forEach(i => addIngredient(i));
+  r.steps.forEach(s => addStep(s));
+}
+
+function saveRecipe() {
+  const title = document.getElementById('f-title').value.trim();
+  const desc = document.getElementById('f-desc').value.trim();
+  const chef = document.getElementById('f-chef').value.trim();
+  const time = document.getElementById('f-time').value.trim();
+  const servings = document.getElementById('f-servings').value.trim();
+
+  if (!title || !desc || !chef || !time || !servings) {
+    showToast('Please fill in all required fields', 'error'); return;
+  }
+
+  const ingredients = [...document.querySelectorAll('#ingredients-list input')]
+    .map(i => i.value.trim()).filter(Boolean);
+  const steps = [...document.querySelectorAll('#steps-list input')]
+    .map(i => i.value.trim()).filter(Boolean);
+
+  if (ingredients.length === 0) { showToast('Add at least one ingredient', 'error'); return; }
+  if (steps.length === 0) { showToast('Add at least one step', 'error'); return; }
+
+  const editId = document.getElementById('edit-id').value;
+  const recipe = {
+    id: editId ? parseInt(editId) : Date.now(),
+    title,
+    description: desc,
+    chef,
+    emoji: document.getElementById('f-emoji').value.trim() || '🍽',
+    cookTime: time,
+    servings,
+    difficulty: document.getElementById('f-difficulty').value,
+    type: document.querySelector('input[name="type"]:checked').value,
+    image: document.getElementById('f-image').value.trim(),
+    videoUrl: document.getElementById('f-video').value.trim(),
+    ingredients,
+    steps
+  };
+
+  if (editId) {
+    const idx = recipes.findIndex(r => r.id === parseInt(editId));
+    recipes[idx] = recipe;
+    showToast('Recipe updated! ✓', 'success');
+  } else {
+    recipes.push(recipe);
+    showToast('Recipe saved! ✓', 'success');
+  }
+
+  saveRecipes();
+  resetForm();
+  showTab('recipes');
+}
+
+function deleteRecipe(id) {
+  if (!confirm('Delete this recipe? This cannot be undone.')) return;
+  recipes = recipes.filter(r => r.id !== id);
+  saveRecipes();
+  renderRecipeList();
+  showToast('Recipe deleted', '');
+}
+
+// =============================================
+// EXPORT
+// =============================================
+function generateExport() {
+  const code = 'let recipes = ' + JSON.stringify(recipes, null, 2) + ';';
+  document.getElementById('export-code').textContent = code;
+  document.getElementById('export-output').style.display = 'block';
+}
+
+function copyExport() {
+  const code = document.getElementById('export-code').textContent;
+  navigator.clipboard.writeText(code).then(() => showToast('Copied to clipboard! ✓', 'success'));
+}
+
+// =============================================
+// TOAST
+// =============================================
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  setTimeout(() => t.className = 'toast', 3000);
+}
+
+// Allow Enter key on login
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('login-screen').style.display !== 'none') login();
+});
+</script>
+</body>
+</html>
