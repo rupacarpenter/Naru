@@ -40,7 +40,7 @@
 
   /* FORM */
   .add-panel{background:var(--warm);border-right:1px solid var(--border);padding:2.5rem 3rem;overflow-y:auto;max-height:calc(100vh - 60px);}
-  .add-panel.editing{background:#FEF6EC;}
+  .add-panel.editing{background:#FEF6EC;border-right:3px solid var(--gold)!important;}
   .edit-banner{background:var(--gold);color:white;font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;padding:0.5rem 1rem;border-radius:2px;margin-bottom:1.2rem;display:none;font-family:'Jost',sans-serif;}
   .edit-banner.show{display:block;}
   .panel-title{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:400;margin-bottom:0.3rem;}
@@ -198,9 +198,16 @@
       <div class="fg-row">
         <div class="fg"><label>Category *</label>
           <select id="f-cat">
-            <option>Bread & Baking</option><option>Fermentation</option><option>Mains</option>
-            <option>Breakfast</option><option>Condiments</option><option>Desserts</option>
-            <option>Snacks</option><option>Soups</option>
+            <option>Breakfast</option>
+            <option>Mains</option>
+            <option>Soups</option>
+            <option>Snacks</option>
+            <option>Desserts</option>
+            <option>Bread & Baking</option>
+            <option>Fermentation</option>
+            <option>Condiments</option>
+            <option>Cocktails</option>
+            <option>Other</option>
           </select>
         </div>
         <div class="fg"><label>Emoji thumbnail</label>
@@ -530,16 +537,31 @@
     // Highlight the row being edited
     renderList();
 
-    // Start tracking changes after a tick (so populating the form doesn't trigger dirty)
-    setTimeout(()=>{
+    // Force selects to visually update (fixes browser rendering glitch)
+    requestAnimationFrame(()=>{
+      setSelectVal('f-cat', r.category);
+      setSelectVal('f-diff', r.difficulty);
+      // Start tracking changes after population is complete
       document.querySelectorAll('#addPanel input, #addPanel textarea, #addPanel select').forEach(el=>{
         el.addEventListener('change', markDirty, {once:false});
         el.addEventListener('input', markDirty, {once:false});
       });
-    }, 100);
+    });
   }
 
-  function setSelectVal(id,val){ if(!val) return; const s=document.getElementById(id); for(let i=0;i<s.options.length;i++){if(s.options[i].value===val||s.options[i].text===val){s.selectedIndex=i;break;}} }
+  function setSelectVal(id,val){
+    if(!val) return;
+    const s=document.getElementById(id);
+    // Try to find existing option
+    for(let i=0;i<s.options.length;i++){
+      if(s.options[i].value===val||s.options[i].text===val){s.selectedIndex=i;return;}
+    }
+    // Not found — add it dynamically so nothing is lost
+    const opt=document.createElement('option');
+    opt.text=val; opt.value=val;
+    s.appendChild(opt);
+    s.value=val;
+  }
   function setRadio(name,val){ const el=document.querySelector(`input[name=${name}][value="${val}"]`); if(el) el.checked=true; }
 
   function cancelEdit(){
