@@ -488,8 +488,12 @@
   // EDIT
   let hasUnsavedChanges = false;
   let currentEditIndex = -1;
+  let currentEditId = -1;
 
   function markDirty(){ hasUnsavedChanges = true; }
+
+  function editById(id){ const recipes=getRecipes(); const i=recipes.findIndex(r=>r.id===id); if(i<0) return; editRecipe(i); }
+  function delById(id){ const recipes=getRecipes(); const i=recipes.findIndex(r=>r.id===id); if(i<0) return; delRecipe(i); }
 
   function editRecipe(i){
     if(hasUnsavedChanges){
@@ -497,6 +501,7 @@
     }
     const r=getRecipes()[i];
     currentEditIndex = i;
+    currentEditId = getRecipes()[i].id;
     hasUnsavedChanges = false;
 
     // Scroll form to top
@@ -570,9 +575,10 @@
     }
     hasUnsavedChanges = false;
     currentEditIndex = -1;
+    currentEditId = -1;
     resetForm();
   }
-  function resetForm(){ hasUnsavedChanges=false; currentEditIndex=-1;
+  function resetForm(){ hasUnsavedChanges=false; currentEditIndex=-1; currentEditId=-1;
     document.getElementById('editIndex').value='-1';
     document.getElementById('formTitle').textContent='Add a Recipe';
     document.getElementById('editBanner').classList.remove('show');
@@ -625,17 +631,14 @@
 
     // featured first within filtered set
     recipes=[...recipes].sort((a,b)=>(b.featured?1:0)-(a.featured?1:0));
-    const allRecipes=getRecipes();
-
     el.innerHTML=recipes.map(r=>{
-      const i=allRecipes.indexOf(r);
       const badges=[
         `<span class="badge badge-cat">${r.category||''}</span>`,
         r.access==='premium'?`<span class="badge badge-premium">⭐ Premium</span>`:`<span class="badge badge-free">Free</span>`,
         r.status==='draft'?`<span class="badge badge-draft">Draft</span>`:'',
         r.featured?`<span class="badge badge-featured">⭑ Featured</span>`:'',
       ].filter(Boolean).join('');
-      const isEditing = (i === currentEditIndex);
+      const isEditing = (r.id === currentEditId);
       return `<div class="rr${isEditing?' is-editing':''}">
         <div class="rr-thumb">${r.emoji||'🍽️'}</div>
         <div class="rr-info">
@@ -643,8 +646,8 @@
           <div class="rr-meta">${badges} · ⏱ ${r.cookTime}</div>
         </div>
         <div class="rr-actions">
-          <button class="rr-edit" onclick="editRecipe(${i})">Edit</button>
-          <button class="rr-del" onclick="delRecipe(${i})">Remove</button>
+          <button class="rr-edit" onclick="editById(${r.id})">Edit</button>
+          <button class="rr-del" onclick="delById(${r.id})">Remove</button>
         </div>
       </div>`;
     }).join('');
