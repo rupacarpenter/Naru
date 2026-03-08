@@ -139,6 +139,8 @@
   .badge-featured{background:#eef2ee;border:1px solid rgba(53,77,60,0.2);color:var(--forest);}
 
   .rr-actions{display:flex;gap:0.4rem;flex-shrink:0;}
+  .rr.is-editing{background:rgba(196,145,58,0.08);border-radius:4px;margin:0 -0.5rem;padding-left:0.5rem;padding-right:0.5rem;border-bottom:1px solid rgba(196,145,58,0.2)!important;}
+  .rr.is-editing .rr-edit{background:var(--gold);border-color:var(--gold);color:white;}
   .rr-del,.rr-edit{background:none;border:1px solid var(--border);color:var(--stone);padding:0.3rem 0.7rem;border-radius:2px;font-size:0.6rem;font-family:'Jost',sans-serif;cursor:pointer;transition:all 0.2s;}
   .rr-del:hover{border-color:#c0392b;color:#c0392b;}
   .rr-edit:hover{border-color:var(--spice);color:var(--spice);}
@@ -477,11 +479,24 @@
   }
 
   // EDIT
+  let hasUnsavedChanges = false;
+  let currentEditIndex = -1;
+
+  function markDirty(){ hasUnsavedChanges = true; }
+
   function editRecipe(i){
+    if(hasUnsavedChanges){
+      if(!confirm('You have unsaved changes. Discard them and edit a different recipe?')) return;
+    }
     const r=getRecipes()[i];
-    document.getElementById('addPanel').scrollTo(0,0);
+    currentEditIndex = i;
+    hasUnsavedChanges = false;
+
+    // Scroll form to top
+    document.getElementById('addPanel').scrollTo({top:0, behavior:'smooth'});
+
     document.getElementById('editIndex').value=i;
-    document.getElementById('formTitle').textContent='Edit Recipe';
+    document.getElementById('formTitle').textContent='Editing: '+r.title;
     document.getElementById('editBanner').classList.add('show');
     document.getElementById('addPanel').classList.add('editing');
     document.getElementById('cancelBtn').classList.add('show');
@@ -511,13 +526,31 @@
     document.getElementById('step-list').innerHTML='';
     if(r.steps&&r.steps.length){ r.steps.forEach(s=>addStep(s)); }
     else { addStep();addStep(); }
+
+    // Highlight the row being edited
+    renderList();
+
+    // Start tracking changes after a tick (so populating the form doesn't trigger dirty)
+    setTimeout(()=>{
+      document.querySelectorAll('#addPanel input, #addPanel textarea, #addPanel select').forEach(el=>{
+        el.addEventListener('change', markDirty, {once:false});
+        el.addEventListener('input', markDirty, {once:false});
+      });
+    }, 100);
   }
 
-  function setSelectVal(id,val){ const s=document.getElementById(id); for(let i=0;i<s.options.length;i++){if(s.options[i].value===val){s.selectedIndex=i;break;}} }
+  function setSelectVal(id,val){ if(!val) return; const s=document.getElementById(id); for(let i=0;i<s.options.length;i++){if(s.options[i].value===val||s.options[i].text===val){s.selectedIndex=i;break;}} }
   function setRadio(name,val){ const el=document.querySelector(`input[name=${name}][value="${val}"]`); if(el) el.checked=true; }
 
-  function cancelEdit(){ resetForm(); }
-  function resetForm(){
+  function cancelEdit(){
+    if(hasUnsavedChanges){
+      if(!confirm('Discard your unsaved changes?')) return;
+    }
+    hasUnsavedChanges = false;
+    currentEditIndex = -1;
+    resetForm();
+  }
+  function resetForm(){ hasUnsavedChanges=false; currentEditIndex=-1;
     document.getElementById('editIndex').value='-1';
     document.getElementById('formTitle').textContent='Add a Recipe';
     document.getElementById('editBanner').classList.remove('show');
@@ -580,7 +613,8 @@
         r.status==='draft'?`<span class="badge badge-draft">Draft</span>`:'',
         r.featured?`<span class="badge badge-featured">⭑ Featured</span>`:'',
       ].filter(Boolean).join('');
-      return `<div class="rr">
+      const isEditing = (i === currentEditIndex);
+      return `<div class="rr${isEditing?' is-editing':''}">
         <div class="rr-thumb">${r.emoji||'🍽️'}</div>
         <div class="rr-info">
           <div class="rr-name">${r.title}</div>
@@ -600,6 +634,10 @@
   }
 
   function init(){ seedRecipes(); renderList(); addIng();addIng();addIng();addStep();addStep(); }
+
+  window.addEventListener('beforeunload', e=>{
+    if(hasUnsavedChanges){ e.preventDefault(); e.returnValue=''; }
+  });
 
   if(sessionStorage.getItem('naru_auth')==='1'){
     document.getElementById('loginScreen').classList.add('hide');
