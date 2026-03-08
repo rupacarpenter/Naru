@@ -137,6 +137,17 @@
   .all-recipes-link:hover{opacity:0.75;}
   .ri-tags{display:flex;gap:0.3rem;flex-wrap:wrap;margin-top:0.3rem;}
   .ri-tag{font-size:0.56rem;background:var(--warm);border:1px solid var(--border);padding:0.1rem 0.45rem;border-radius:100px;color:var(--stone);}
+
+  /* Booking modal extras */
+  .modal{max-height:90vh;overflow-y:auto;}
+  .b-error{font-size:0.75rem;color:#c0392b;margin-bottom:0.6rem;display:none;}
+  .b-error.show{display:block;}
+  .modal-submit:disabled{opacity:0.5;cursor:not-allowed;}
+  .ok-icon{font-size:2.5rem;margin-bottom:0.8rem;}
+  .ok-title{font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:0.5rem;}
+  .ok-msg{font-size:0.82rem;color:var(--stone);line-height:1.7;}
+  .modal-ok{text-align:center;padding:2rem 1rem;}
+  #bookingForm.hide{display:none;}
 </style>
 </head>
 <body>
@@ -273,16 +284,64 @@
 <div class="overlay" id="overlay">
   <div class="modal">
     <button class="modal-x" onclick="closeModal()">✕</button>
-    <div class="modal-ey">Get in touch</div>
-    <h3>Book or Order</h3>
-    <p class="modal-sub">Drop us a message and we'll be in touch within 48 hours.</p>
-    <div class="fg"><label>Your Name</label><input type="text" placeholder="First and last name"></div>
-    <div class="fg"><label>Email</label><input type="email" placeholder="you@example.com"></div>
-    <div class="fg"><label>What are you interested in?</label><select><option>Private Dinner</option><option>Sourdough Order</option><option>Pickles / Chilli Oil</option><option>Sourdough Starter</option><option>Something else</option></select></div>
-    <div class="fg-row"><div class="fg"><label>Date (if relevant)</label><input type="date"></div><div class="fg"><label>Guests</label><input type="number" placeholder="e.g. 8"></div></div>
-    <div class="fg"><label>Message</label><textarea placeholder="Anything helpful — dietary needs, ideas, questions..."></textarea></div>
-    <button class="modal-submit" onclick="document.getElementById('modalOk').classList.add('show')">Send Message</button>
-    <div class="modal-ok" id="modalOk">Message received — we'll be in touch very soon. Thank you! 🙏</div>
+    <div class="modal-ey">Book a Private Dinner</div>
+    <h3>Make an Enquiry</h3>
+    <p class="modal-sub">Tell us a little about your event and we’ll be in touch within 48 hours.</p>
+
+    <div id="bookingForm">
+      <div class="fg"><label>Your Name *</label><input type="text" id="b-name" placeholder="First and last name"></div>
+      <div class="fg-row">
+        <div class="fg"><label>Email *</label><input type="email" id="b-email" placeholder="you@example.com"></div>
+        <div class="fg"><label>Phone</label><input type="tel" id="b-phone" placeholder="+44 7700 000000"></div>
+      </div>
+      <div class="fg-row">
+        <div class="fg"><label>Event Date</label><input type="date" id="b-date"></div>
+        <div class="fg"><label>Number of Guests</label><input type="number" id="b-guests" placeholder="e.g. 8" min="1"></div>
+      </div>
+      <div class="fg"><label>Type of Event</label>
+        <select id="b-type">
+          <option value="">Select an option…</option>
+          <option>Dinner Party</option>
+          <option>Supper Club</option>
+          <option>Corporate Event</option>
+          <option>Birthday / Celebration</option>
+          <option>Something else</option>
+        </select>
+      </div>
+      <div class="fg"><label>Dietary Requirements</label>
+        <input type="text" id="b-dietary" placeholder="e.g. vegetarian, nut allergy, gluten-free…">
+      </div>
+      <div class="fg"><label>Approximate Budget</label>
+        <select id="b-budget">
+          <option value="">Prefer not to say</option>
+          <option>Under £500</option>
+          <option>£500 – £1,000</option>
+          <option>£1,000 – £2,000</option>
+          <option>£2,000+</option>
+        </select>
+      </div>
+      <div class="fg"><label>How did you hear about NARU?</label>
+        <select id="b-source">
+          <option value="">Select…</option>
+          <option>Instagram</option>
+          <option>Word of mouth</option>
+          <option>Google search</option>
+          <option>Attended a supper club</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="fg"><label>Anything else?</label>
+        <textarea id="b-message" style="height:80px" placeholder="Ideas, questions, special requests…"></textarea>
+      </div>
+      <div class="b-error" id="b-error"></div>
+      <button class="modal-submit" id="b-submit" onclick="submitBooking()">Send Enquiry →</button>
+    </div>
+
+    <div class="modal-ok" id="modalOk">
+      <div class="ok-icon">🙏</div>
+      <div class="ok-title">Enquiry received!</div>
+      <div class="ok-msg">Thank you — we’ll be in touch within 48 hours to discuss your event.</div>
+    </div>
   </div>
 </div>
 
@@ -362,7 +421,60 @@
 
   seedRecipes();
 
-  function openModal() { document.getElementById('overlay').classList.add('show'); document.getElementById('modalOk').classList.remove('show'); }
+  function openModal() {
+    document.getElementById('overlay').classList.add('show');
+    document.getElementById('modalOk').classList.remove('show');
+    document.getElementById('bookingForm').classList.remove('hide');
+    document.getElementById('b-submit').disabled = false;
+    document.getElementById('b-submit').textContent = 'Send Enquiry →';
+  }
+
+  async function submitBooking() {
+    const name = document.getElementById('b-name').value.trim();
+    const email = document.getElementById('b-email').value.trim();
+    const errEl = document.getElementById('b-error');
+
+    if (!name || !email) {
+      errEl.textContent = 'Please fill in your name and email before sending.';
+      errEl.classList.add('show');
+      return;
+    }
+    errEl.classList.remove('show');
+
+    const btn = document.getElementById('b-submit');
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+
+    const payload = {
+      name,
+      email,
+      phone:    document.getElementById('b-phone').value.trim(),
+      date:     document.getElementById('b-date').value,
+      guests:   document.getElementById('b-guests').value,
+      type:     document.getElementById('b-type').value,
+      dietary:  document.getElementById('b-dietary').value.trim(),
+      budget:   document.getElementById('b-budget').value,
+      source:   document.getElementById('b-source').value,
+      message:  document.getElementById('b-message').value.trim(),
+      submittedAt: new Date().toLocaleString('en-GB')
+    };
+
+    const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxPcF9MXM6CaOZj84thvcdL-RbixKsDtJLT4PL45Aza9jW7EBbKnbaReYe05XLfX5zPPg/exec';
+
+    try {
+      await fetch(SHEET_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+    } catch(e) {
+      // no-cors means we can't read the response, but it still sends
+    }
+
+    document.getElementById('bookingForm').classList.add('hide');
+    document.getElementById('modalOk').classList.add('show');
+  }
   function closeModal() { document.getElementById('overlay').classList.remove('show'); }
   document.getElementById('overlay').addEventListener('click', e => { if (e.target === document.getElementById('overlay')) closeModal(); });
 
